@@ -12,4 +12,4 @@ def index():
 
 @app.route('/scraper')
 def scraper():
-	return get_content()
+	return render_template('scrape.html',links=get_content())
