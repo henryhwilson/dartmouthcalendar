@@ -28,10 +28,10 @@
     <div id="myCarousel" class="carousel slide" data-interval="3000" data-ride="carousel">
       <!-- Carousel indicators -->
         <ol class="carousel-indicators">
-            <li data-target="#myCarousel" data-slide-to="1" class="active"></li>
+            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#myCarousel" data-slide-to="1"></li>
             <li data-target="#myCarousel" data-slide-to="2"></li>
-            <li data-target="#myCarousel" data-slide-to="3"></li>
-            <li data-target="#myCarousel" data-slide-to="4"></li>
+<!--             <li data-target="#myCarousel" data-slide-to="4"></li>
             <li data-target="#myCarousel" data-slide-to="5"></li>
             <li data-target="#myCarousel" data-slide-to="6"></li>
             <li data-target="#myCarousel" data-slide-to="7"></li>
@@ -39,15 +39,38 @@
             <li data-target="#myCarousel" data-slide-to="9"></li>
             <li data-target="#myCarousel" data-slide-to="10"></li>
             <li data-target="#myCarousel" data-slide-to="11"></li>
-            <li data-target="#myCarousel" data-slide-to="12"></li>
+            <li data-target="#myCarousel" data-slide-to="12"></li> -->
 
         </ol>   
        <!-- Carousel items -->
         <div class="carousel-inner" id="cal">
             <div class="active item">
-                <h2>{{current_month}}</h2>
+
+                <h2>October</h2>
                 <div class="carousel-caption">
-                    {{cal.length}}
+                    Month goes here.              
+                </div>
+            </div>
+            <div class="item">
+
+                <h2>November</h2>
+                <div class="carousel-caption">
+                    Month goes here.              
+                </div>
+            </div>
+            <div class="item">
+
+                <h2>December</h2>
+                <div class="carousel-caption">
+                    Month goes here.              
+                </div>
+            </div>
+        </div>
+
+<!--             </div>
+                <h2>{{current_month}} lal</h2>
+                <div class="carousel-caption">
+                    {{cal.length}} hii
                 </div>
             </div>
             <div class="item">
@@ -57,7 +80,7 @@
                 </div>
             </div>
 
-        </div>
+        </div> -->
         <!-- Carousel nav -->
         <a class="carousel-control left" href="#myCarousel" data-slide="prev">
             <span class="glyphicon glyphicon-chevron-left"></span>
@@ -66,5 +89,38 @@
             <span class="glyphicon glyphicon-chevron-right"></span>
         </a>
     </div>
+    {% for month in cal %}
+                {% set current_month = loop.index %}
+                <div>
+                    <h1>{{ ['January', 'Febuary', 'March', 'April',
+                            'May', 'June', 'July', 'August',
+                            'September', 'October', 'November', 'December'][loop.index0] }} {{ year }}</h1>
+                    <table class="table table-striped table-bordered" cellspacing="0" width="100%">
+                        <tr align="center">
+                            <td> Sunday </td>
+                            <td> Monday </td>
+                            <td> Tuesday </td>
+                            <td> Wednesday </td>
+                            <td> Thursday </td>
+                            <td> Friday </td>
+                            <td> Saturday </td>
+
+                        </tr>
+                        {% for week in month %}
+                        <tr align="center">
+                            {% for date in week %}
+                                {% if date.month == current_month %}
+                                <td class="current-month">
+                                {% else %}
+                                <td class="past-month">
+                                {% endif %}
+                                {{ date.day }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                {% endfor %}
 </div>
 {% endblock %}
