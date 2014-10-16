@@ -6,10 +6,38 @@
     {% else %}
     <title>Dartmouth Calendar</title>
     {% endif %}
+    <meta charset="utf-8" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width" />
+    <!-- Included CSS Files (Uncompressed) -->
+    <!-- Included CSS Files (Compressed) -->
+
+    <style type="text/css">
+    h2{
+      margin: 0;     
+      color: #666;
+      padding-top: 90px;
+      font-size: 52px;
+      font-family: "trebuchet ms", sans-serif;    
+    }
+    .item{
+      background: #333;    
+      text-align: center;
+      height: 300px !important;
+    }
+    .carousel{
+      margin-top: 20px;
+    }
+    .bs-example{
+      margin: 20px;
+    }
+    </style>
+
   </head>
   <body>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
         <div class="navbar navbar-default" role="navigation">
         <div class="container-fluid">
           <div class="navbar-header">
@@ -38,5 +66,5 @@
     {% endif %}
     {% endwith %}
     {% block content %}{% endblock %}
-  </body>
+</body>
 </html>
