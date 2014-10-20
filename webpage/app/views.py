@@ -1,8 +1,8 @@
-from flask import render_template, abort
+from flask import render_template, abort, request
 from calendar import Calendar
 from datetime import date
 from app import app
-from scrape import get_content
+from scrape import get_content, get_event
 
 
 @app.route('/', defaults={'year': None})
@@ -20,6 +20,12 @@ def index(year):
 		return render_template('index.html', title='Home', user=user, year=year, cal=cal_list)
 	abort(404)
 
-@app.route('/scraper')
+@app.route('/scraper', methods=['GET'])
 def scraper():
-	return render_template('scrape.html',links=get_content())
+	url = request.args.get("event_url")
+	subject = request.args.get("subject")
+	if (url == None):
+		return_data = get_content()
+	else:
+		return_data = get_event(url,subject)
+	return render_template('scrape.html',data=return_data,event_url=url)

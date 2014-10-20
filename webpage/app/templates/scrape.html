@@ -1,8 +1,13 @@
 {% block content %}
-    <h1>Links from LISTSERV</h1>
-    <ul>
-    {% for link in links %}
-    <li>{{ link }}</li>
-    {% endfor %}
-    </ul>
+	{% if event_url == None %}
+    	<h1>Links from LISTSERV</h1>
+    	<ul>
+    	{% for link in data %}
+    	<li><a href="?event_url={{ link[1] }}&subject={{ link[0] }}">{{ link[0] }}</a></li>
+    	{% endfor %}
+    	</ul>
+    {% else %}
+    	<h1>{{ data[1] }}</h1>
+    	{{ data[0] }}
+    {% endif %}
 {% endblock %}
