@@ -23,9 +23,8 @@ def index(year):
 @app.route('/scraper', methods=['GET'])
 def scraper():
 	url = request.args.get("event_url")
-	subject = request.args.get("subject")
 	if (url == None):
 		return_data = get_content()
 	else:
-		return_data = get_event(url,subject)
+		return_data = get_event(url)
 	return render_template('scrape.html',data=return_data,event_url=url)
