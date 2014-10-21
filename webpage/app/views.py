@@ -5,11 +5,12 @@ from app import app
 from scrape import get_content, get_event
 
 
-@app.route('/', defaults={'year': None})
+@app.route('/', defaults={'year': 2014})
 @app.route('/<int:year>/')
 def index(year):
 	user = {'nickname': 'Dartmouth'}  # fake user
 	cal = Calendar(0)
+	cal.setfirstweekday(6)  # 6 represents Sunday. Sets first weekday to Sunday.
 	try:
 		if not year:
 			year = date.today().year
@@ -28,3 +29,13 @@ def scraper():
 	else:
 		return_data = get_event(url)
 	return render_template('scrape.html',data=return_data,event_url=url)
+
+@app.route('/login', methods = ['GET', 'POST'])
+def login():
+    return render_template('login.html', 
+        title = 'Sign In')
+
+@app.route('/account', methods = ['GET', 'POST'])
+def account():
+    return render_template('account.html', 
+        title = 'Sign In')
