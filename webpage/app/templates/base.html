@@ -31,14 +31,30 @@
     .bs-example{
       margin: 20px;
     }
-    </style>
+    .navbar-custom {
+      background-color:#229922;
+      color:#ffffff;
+      border-radius:0;
+    }
+
+    .navbar-custom .navbar-nav > li > a {
+      color: green;
+    }
+    .navbar-custom .navbar-nav > .active > a, .navbar-nav > .active > a:hover, .navbar-nav > .active > a:focus {
+      color: black;
+      background-color:transparent;
+    }
+    .navbar-custom .navbar-brand {
+      color: green;
+    }
+  </style>
 
   </head>
   <body>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-        <div class="navbar navbar-default" role="navigation">
+        <div class="navbar navbar-default navbar-custom" role="navigation">
         <div class="container-fluid">
           <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -51,7 +67,10 @@
           </div>
           <div class="navbar-collapse nav-pills collapse">
             <ul class="nav navbar-nav">
-              <li><a href="{{ url_for('index') }}"><i class="fa fa-home"></i> Home</a></li>
+              <li><a href="{{ url_for('index') }}"><i class="fa fa-home"></i>Home</a></li>
+              <li><a href="{{ url_for('login') }}"><i class="fa fa-home"></i>Login</a></li>
+              <li><a href="{{ url_for('account') }}"><i class="fa fa-home"></i>Account</a></li>
+
             </ul>
           </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->
