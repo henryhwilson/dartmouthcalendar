@@ -7,18 +7,24 @@ from scrape import get_content, get_event
 
 @app.route('/', defaults={'year': 2014})
 @app.route('/<int:year>/')
+@app.route('/index', defaults={'year': 2014})
 def index(year):
 	user = {'nickname': 'Dartmouth'}  # fake user
 	cal = Calendar(0)
 	cal.setfirstweekday(6)  # 6 represents Sunday. Sets first weekday to Sunday.
+	day=date.today().day
+	month=date.today().month
 	try:
 		if not year:
 			year = date.today().year
+			day=date.today().day
+			month=date.today().month
+
 		cal_list = [cal.monthdatescalendar(year, i+1) for i in xrange(12)]
 	except Exception, e:
 		abort(404)
 	else:
-		return render_template('index.html', title='Home', user=user, year=year, cal=cal_list)
+		return render_template('index.html', title='Home', day=day, month=month, user=user, year=year, cal=cal_list)
 	abort(404)
 
 @app.route('/scraper', methods=['GET'])
