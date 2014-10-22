@@ -7,6 +7,7 @@ from scrape import get_content, get_event
 
 @app.route('/', defaults={'year': 2014})
 @app.route('/<int:year>/')
+@app.route('/index', defaults={'year': 2014})
 def index(year):
 	user = {'nickname': 'Dartmouth'}  # fake user
 	cal = Calendar(0)
