@@ -53,3 +53,14 @@ h2{
   top: 50%;
 
 }
+
+tr, td {
+  border: 2px solid black;
+  text-align:center;
+
+}
+
+.mainTable{
+  height:800px;
+
+}
