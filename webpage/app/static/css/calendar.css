@@ -34,7 +34,33 @@ h2{
 }
 
 .myButton{
-  border-radius:100%;
-  border:1px solid green;
-  color:green;
+  border-radius:30%;
+  border:2px solid #336666;
+  color:#336666;
+  font-family:Arial;
+}
+
+#tomorrowButton{
+  position:fixed;
+  right: 3%;
+  top: 50%;
+
+}
+
+#yesterdayButton{
+  position:fixed;
+  left: 3%;
+  top: 50%;
+
+}
+
+tr, td {
+  border: 2px solid black;
+  text-align:center;
+
+}
+
+.mainTable{
+  height:800px;
+
 }

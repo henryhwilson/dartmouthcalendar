@@ -108,22 +108,34 @@
             </tr>
         </table>   
     </div>
-    <table>
-        <tr style="margin:auto"> 
-            <td style="width:5%">
-                <input type="button" name="b1" value="Yesterday" onclick="location.href='index'" class="myButton">
-            </td>
-            <td style="width:90%">
-                <div id="day month year">
-                    <h1 style="text-align:center; margin: auto">
+    <input type="button" name="b1" value="Yesterday" onclick="location.href='index'" class="myButton" id="yesterdayButton">
+    <div style="margin:auto">
+        <div id="day month year">
+            <h1 style="text-align:center; margin: auto">
                             Today is {{month}}/{{day}}/{{year}}
-                    </h1>
-                </div>
-            </td>
-            <td style="width: 5%">
-                <input type="button" name="b1" value="Tomorrow" onclick="location.href='index'" class="myButton">
-            </td>
-        </tr>
-    </table>
+            </h1>
+            <p>
+
+            </p>
+        </div>
+        <table style="margin:auto; border: 2px solid black; width:60%; table-layout:fixed">
+            <tr>
+                <td class="mainTable">
+                    Greek Life
+                </td>
+                <td class="mainTable">
+                    Sports
+                </td>
+            </tr>
+            <tr>
+                <td class="mainTable">
+                    Free Food Events
+                </td>
+                <td class="mainTable">
+                    Other
+                </td>
+            </tr>
+
+    <input type="button" name="b1" value="Tomorrow" onclick="location.href='index'" class="myButton" id="tomorrowButton">
 </div>
 {% endblock %}
