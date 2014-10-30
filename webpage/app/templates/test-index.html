@@ -1,0 +1,81 @@
+<html>
+<head>
+<style>
+h1 {
+	color: green;
+	font-size: 4em;
+	font-family: courier;
+	margin-bottom: 10px;
+}
+h4 {
+	color: #aeaeae;
+	font-size: 1.5em;
+	padding-top: 0;
+	margin-top: 0;
+	font-family: verdana;
+	margin-bottom: 10;
+	font-weight: normal;
+}
+.sidebar {
+	float: right;
+	padding-right: 300px;
+	font-family: verdana;
+	font-size: 2em;
+}
+.sidebar a{
+	color: grey;
+	text-decoration: none;
+}
+.list-item {
+	color: grey;
+}
+.events-now-1, .events-now-2, .events-now-3 {
+	padding: 20px;
+}
+.events-now-1{
+	padding-top: 0;
+	margin-top: 0;
+}
+.events .title, .events .in-progess, .events .locations {
+	font-family: courier;
+}
+.events .title {
+	font-size: 1.5em;
+}
+.events .in-progess {
+	font-size: 1em;
+}
+.events .locations {
+	font-size: 1em;
+	color: red;
+}
+</style>
+</head>
+<body>
+<h1>Dartmouth Calendar</h1>
+<div class="sidebar">
+<div class="list-item"><a href="#@now">today</a></div>
+<div class="list-item"><a href="#@now">tomorrow</a></div>
+<div class="list-item"><a href="#@now">upcoming</a></div>
+</div>
+<div class="events">
+	<h4 id="@now">today</h4>
+	<div class="events-now-1">
+		<span class="title">Greek:</span> <span class="in-progess">4 in progress</span> <span class="locations">(@ SigEp, Beta, AXA, Heorot)</span>
+	</div>
+	<div class="events-now-2">
+		<span class="title">Social:</span> <span class="in-progess">2 in progress</span> <span class="locations">(@ Collis Underground, Hopkins Center)</span>
+	</div>
+	<div class="events-now-2">
+		<span class="title">Sports:</span> <span class="in-progess">2 in progress</span> <span class="locations">(@ Alumni Gym, Football Field)</span>
+	</div>
+	<div class="events-now-3">
+		<span class="title">Misc.:</span> <span class="in-progess">4 in progress</span> <span class="locations">(@ Fahey, Bolocco, The Green, BEMA)</span>
+	</div>
+	<br>
+
+	<h4 id="tomorrow">tomorrow</h4>
+	<h4 id="weekend">upcoming</h4>
+</div>
+</body>
+</html>
