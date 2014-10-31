@@ -1,15 +1,24 @@
 h1 {
 	color: green;
-	font-size: 4em;
+	font-size: 1em;
 	font-family: courier;
 	margin-bottom: 0;
 	margin-top: 10px;
 	margin-left: 20px;
 	background-color: #e6e6e6;
 	display: inline-block;
+	font-weight: normal;
+}
+#main_title a {
+	color: green;
+	font-size: 4em;
+	font-family: courier;
+	margin: 0;
 	padding-left: 4px;
 	padding-right: 4px;
-	font-weight: normal;
+}
+#main_title a:hover {
+	background-color: #f6f6f6;
 }
 h2 {
 	color: grey;
@@ -37,6 +46,9 @@ h2 {
 	color: white;
 	text-decoration: none;
 }
+.sidebar a:hover{
+	text-decoration: underline;
+}
 .sidebar ul {
 	list-style-type: none;
 	margin: 0;
@@ -52,9 +64,8 @@ h2 {
 
 .events {
 	width: 70%;
-	position: fixed;
-	left: 20px;
-	top: 0;
+	padding-left: 20px;
+	padding-top: 0;
 	margin-bottom: 30px;
 }
 
@@ -86,7 +97,6 @@ h2 {
 }
 .events .title {
 	font-size: 1.5em;
-	font-weight: bold;
 }
 .events .in-progess {
 	font-size: 1.5em;
@@ -101,6 +111,26 @@ h2 {
 }
 .events li {
 	padding: 10px;
+}
+
+.events .highlight .title:hover, .events .highlight #event-location:hover {
+	cursor: pointer;
+	cursor: hand;
+	text-decoration: underline;
+}
+
+.events .highlight ul {
+	font-family: courier;
+	font-size: 1.5em;
+}
+
+.events .highlight .subject {
+	font-style: italic;
+		color: #555555;
+}
+
+.events .highlight .host {
+	background-color:#e6e6e6;
 }
 
 .footer {

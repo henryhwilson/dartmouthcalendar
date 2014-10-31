@@ -7,31 +7,61 @@
 {% block content %}
 	<a href="#today1" id="today">{% if is_day == False %}tonight{% else %}today{% endif %}</a>
 	<div class="events-today">
-		<ul>
+		<ul class="highlight">
 		{% for category in categories %}
+			{% if today_cat_freq[category] > 0 %}
 			{% set printed = 0 %}
-			<li><span class="title">{{ category }}:</span> <span class="in-progess">{{ cat_freq[category] }} event{{ 's' if cat_freq[category] != 1 else '' }}</span> <span class="locations">
-			{% for event in events %}{% if event['category'] == category %}{% if printed == 0 %}({{nicknames[event['from']]}}{% else %}{{ ', ' + nicknames[event['from']] }}{% endif %}{% if printed + 1 == cat_freq[category] %}){% endif %}{% set printed = printed + 1 %}{% endif %}{% endfor %}</span></li>
+			<li><span class="title" id="title-today-{{ category}}"><b>{{ category }}:</b> {{ today_cat_freq[category] }} event{{ 's' if today_cat_freq[category] != 1 else '' }}</span> <span class="locations">
+			{% for event in events %}{% if event['category'] == category and event['date_event'] == 'today' %}{% if printed == 0 %}(<span id="event-location">{{nicknames[event['from']]}}</span>{% else %}, <span id="event-location">{{ nicknames[event['from']] }}</span>{% endif %}{% if printed + 1 == today_cat_freq[category] %}){% endif %}{% set printed = printed + 1 %}{% endif %}{% endfor %}</span>
+			<ul id="expanded-today-{{ category }}" {% if today_total_events > 4 %}style="display: none"{% endif %}>
+			{% for event in events %}
+			{% if event['category'] == category and event['date_event'] == 'today' %}
+			<li><span class="host">{{ event['time_event'] }} {{nicknames[event['from']]}}:</span> <span class="subject">{{event['subject']}}</span></li>
+			{% endif %}
+			{% endfor %}
+			</ul>
+			</li>
+			{% endif %}
 		{% endfor %}
 		</ul>
 	</div>
 	<a href="#tomorrow1" id="tomorrow">tomorrow</a>
 	<div class="events-tomorrow">
-		<ul>
+				<ul class="highlight">
 		{% for category in categories %}
+			{% if tomorrow_cat_freq[category] > 0 %}
 			{% set printed = 0 %}
-			<li><span class="title">{{ category }}:</span> <span class="in-progess">{{ cat_freq[category] }} event{{ 's' if cat_freq[category] != 1 else '' }}</span> <span class="locations">
-			{% for event in events %}{% if event['category'] == category %}{% if printed == 0 %}({{nicknames[event['from']]}}{% else %}{{ ', ' + nicknames[event['from']] }}{% endif %}{% if printed + 1 == cat_freq[category] %}){% endif %}{% set printed = printed + 1 %}{% endif %}{% endfor %}</span></li>
+			<li><span class="title" id="title-tomorrow-{{ category}}"><b>{{ category }}:</b> {{ tomorrow_cat_freq[category] }} event{{ 's' if tomorrow_cat_freq[category] != 1 else '' }}</span> <span class="locations">
+			{% for event in events %}{% if event['category'] == category and event['date_event'] == 'tomorrow' %}{% if printed == 0 %}(<span id="event-location">{{nicknames[event['from']]}}</span>{% else %}, <span id="event-location">{{ nicknames[event['from']] }}</span>{% endif %}{% if printed + 1 == tomorrow_cat_freq[category] %}){% endif %}{% set printed = printed + 1 %}{% endif %}{% endfor %}</span>
+			<ul id="expanded-tomorrow-{{ category }}" {% if tomorrow_total_events > 4 %}style="display: none"{% endif %}>
+			{% for event in events %}
+			{% if event['category'] == category and event['date_event'] == 'tomorrow' %}
+			<li><span class="host">{{ event['time_event'] }} {{nicknames[event['from']]}}:</span> <span class="subject">{{event['subject']}}</span></li>
+			{% endif %}
+			{% endfor %}
+			</ul>
+			</li>
+			{% endif %}
 		{% endfor %}
 		</ul>
 	</div>
 	<a href="#upcoming1" id="upcoming">upcoming</a>
 	<div class="events-upcoming">
-		<ul>
+		<ul class="highlight">
 		{% for category in categories %}
+			{% if upcoming_cat_freq[category] > 0 %}
 			{% set printed = 0 %}
-			<li><span class="title">{{ category }}:</span> <span class="in-progess">{{ cat_freq[category] }} event{{ 's' if cat_freq[category] != 1 else '' }}</span> <span class="locations">
-			{% for event in events %}{% if event['category'] == category %}{% if printed == 0 %}({{nicknames[event['from']]}}{% else %}{{ ', ' + nicknames[event['from']] }}{% endif %}{% if printed + 1 == cat_freq[category] %}){% endif %}{% set printed = printed + 1 %}{% endif %}{% endfor %}</span></li>
+			<li><span class="title" id="title-upcoming-{{ category}}"><b>{{ category }}:</b> {{ upcoming_cat_freq[category] }} event{{ 's' if upcoming_cat_freq[category] != 1 else '' }}</span> <span class="locations">
+			{% for event in events %}{% if event['category'] == category and event['date_event'] == 'upcoming' %}{% if printed == 0 %}(<span id="event-location">{{nicknames[event['from']]}}</span>{% else %}, <span id="event-location">{{ nicknames[event['from']] }}</span>{% endif %}{% if printed + 1 == upcoming_cat_freq[category] %}){% endif %}{% set printed = printed + 1 %}{% endif %}{% endfor %}</span>
+			<ul id="expanded-upcoming-{{ category }}" {% if upcoming_total_events > 4 %}style="display: none"{% endif %}>
+			{% for event in events %}
+			{% if event['category'] == category and event['date_event'] == 'upcoming' %}
+			<li><span class="host">{{ event['time_event'] }} {{nicknames[event['from']]}}:</span> <span class="subject">{{event['subject']}}</span></li>
+			{% endif %}
+			{% endfor %}
+			</ul>
+			</li>
+			{% endif %}
 		{% endfor %}
 		</ul>
 	</div>

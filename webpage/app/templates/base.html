@@ -20,16 +20,16 @@
 
 		<div class="sidebar">
 			<ul>
-				<li>add event</li>
-				<li>unsubscribe from listserv</li>
-				<li>faq</li>
+				<li><a href="#add_event">add event</a></li>
+				<li><a href="#unsubscribe_listserv">unsubscribe from listserv</a></li>
+				<li><a href="#faq">faq</a></li>
 			</ul>
 		</div>	
 
 		<div class="events">
 
-		<h1>DARTMOUTH CALENDAR</h1>
-		<h2>&ldquo;deciphers blitzes so you don't have to&rdquo;</h2>
+		<h1 id="main_title"><a href="/index">DARTMOUTH CALENDAR</a></h1>
+		<h2>&ldquo;the blitz machine&rdquo;</h2>
 
 		{% block content %}{% endblock %}
 
@@ -52,6 +52,84 @@ $( "#upcoming, #upcoming-sidebar" ).click(function() {
   $(".events-tomorrow").hide(0);
   $(".events-upcoming").show(300);
 });
+{% if today_total_events > 4 %}
+$( "#title-today-Greek" ).click(function() {
+  $("#expanded-today-Greek").show(300);
+  $("#expanded-today-Social").hide(0);
+  $("#expanded-today-Sports").hide(0);
+  $("#expanded-today-Misc").hide(0);
+});
+$( "#title-today-Social" ).click(function() {
+  $("#expanded-today-Greek").hide(0);
+  $("#expanded-today-Social").show(300);
+  $("#expanded-today-Sports").hide(0);
+  $("#expanded-today-Misc").hide(0);
+});
+$( "#title-today-Sports" ).click(function() {
+  $("#expanded-today-Greek").hide(0);
+  $("#expanded-today-Social").hide(0);
+  $("#expanded-today-Sports").show(300);
+  $("#expanded-today-Misc").hide(0);
+});
+$( "#title-today-Misc" ).click(function() {
+  $("#expanded-today-Greek").hide(0);
+  $("#expanded-today-Social").hide(0);
+  $("#expanded-today-Sports").hide(0);
+  $("#expanded-today-Misc").show(300);
+});
+{% endif %}
+{% if tomorrow_total_events > 4 %}
+$( "#title-tomorrow-Greek" ).click(function() {
+  $("#expanded-tomorrow-Greek").show(300);
+  $("#expanded-tomorrow-Social").hide(0);
+  $("#expanded-tomorrow-Sports").hide(0);
+  $("#expanded-tomorrow-Misc").hide(0);
+});
+$( "#title-tomorrow-Social" ).click(function() {
+  $("#expanded-tomorrow-Greek").hide(0);
+  $("#expanded-tomorrow-Social").show(300);
+  $("#expanded-tomorrow-Sports").hide(0);
+  $("#expanded-tomorrow-Misc").hide(0);
+});
+$( "#title-tomorrow-Sports" ).click(function() {
+  $("#expanded-tomorrow-Greek").hide(0);
+  $("#expanded-tomorrow-Social").hide(0);
+  $("#expanded-tomorrow-Sports").show(300);
+  $("#expanded-tomorrow-Misc").hide(0);
+});
+$( "#title-tomorrow-Misc" ).click(function() {
+  $("#expanded-tomorrow-Greek").hide(0);
+  $("#expanded-tomorrow-Social").hide(0);
+  $("#expanded-tomorrow-Sports").hide(0);
+  $("#expanded-tomorrow-Misc").show(300);
+});
+{% endif %}
+{% if upcoming_total_events > 4 %}
+$( "#title-upcoming-Greek" ).click(function() {
+  $("#expanded-upcoming-Greek").show(300);
+  $("#expanded-upcoming-Social").hide(0);
+  $("#expanded-upcoming-Sports").hide(0);
+  $("#expanded-upcoming-Misc").hide(0);
+});
+$( "#title-upcoming-Social" ).click(function() {
+  $("#expanded-upcoming-Greek").hide(0);
+  $("#expanded-upcoming-Social").show(300);
+  $("#expanded-upcoming-Sports").hide(0);
+  $("#expanded-upcoming-Misc").hide(0);
+});
+$( "#title-upcoming-Sports" ).click(function() {
+  $("#expanded-upcoming-Greek").hide(0);
+  $("#expanded-upcoming-Social").hide(0);
+  $("#expanded-upcoming-Sports").show(300);
+  $("#expanded-upcoming-Misc").hide(0);
+});
+$( "#title-upcoming-Misc" ).click(function() {
+  $("#expanded-upcoming-Greek").hide(0);
+  $("#expanded-upcoming-Social").hide(0);
+  $("#expanded-upcoming-Sports").hide(0);
+  $("#expanded-upcoming-Misc").show(300);
+});
+{% endif %}
 </script>
 </body>
 </html>
