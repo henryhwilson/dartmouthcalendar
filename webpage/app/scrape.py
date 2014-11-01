@@ -7,9 +7,8 @@ from pytz import timezone
 from datetime import datetime
 from bs4 import BeautifulSoup
 
-def get_content():
-	# Get the month and week of month of today.
-	date = datetime.now().date()
+def get_content(): #returns a list of recent blitzes
+	date = datetime.now().date() # Get the month and week of month of today.
 	year = date.year
 	year = year % 2000  # only the last two digits of year.
 	month = date.month
@@ -36,32 +35,36 @@ def get_content():
 	# Scrape for this week.
 	listserv_url = 'https://listserv.dartmouth.edu/scripts/wa.exe?A1=ind' + str(year) + str(padded_month) + letter_for_week + '&L=CAMPUS-EVENTS&O=D&H=0&D=1&T=1'
 
-	r = requests.get(listserv_url)
-	soup = BeautifulSoup(r.text)
-	events = []
+	# basically, this part finds the correct link for the list of this week's events, then gets the basic info for all of those events
+
+	r = requests.get(listserv_url) # stores url response in var "r"
+	soup = BeautifulSoup(r.text) # stores url response in a BeautifulSoup object for later parsing
+	events = [] # initialize vars
 	iterator = 0
-	for link in soup.find_all('a'):
-		if iterator > 0:
+	for link in soup.find_all('a'): # go through every link from the url
+		if iterator > 0: # we only want to go through this loop once, iterator makes sure of that
 			break
-		href = link.get('href')
-		if href:
-			if  '/scripts/wa.exe?A1=' in href:
-   				r = requests.get('https://listserv.dartmouth.edu'+href)
-   				soup2 = BeautifulSoup(r.text)
-   				for event in soup2.find_all('a'):
+		href = link.get('href') # href now holds the href of the link
+		if href: # if href isn't None
+			if  '/scripts/wa.exe?A1=' in href: # if href contains this string, it's what we're looking for
+   				r = requests.get('https://listserv.dartmouth.edu'+href) # makes a new request from this link
+   				soup2 = BeautifulSoup(r.text) # puts it into beautifulsoup format
+   				for event in soup2.find_all('a'): # for all of the links on this page
    					if event.get('href'):
    						if '/scripts/wa.exe?A2=' in event.get('href'):
    							data = []
-   							data.append(event.text)
-   							data.append(urllib.quote_plus(event.get('href')))
+   							data.append(event.text) # add the event title
+   							data.append(urllib.quote_plus(event.get('href'))) # add the url for the event
    							events.append(data)
    				iterator = iterator + 1
 
    	# Scrape for last week
    	# NOTE: I will move this soup/link/event/iterator stuff into a separate function,
    	# once I know it is okay to do that.
+   	# h: yeah that'd be good! also might want to get the "from" field (who the event was sent from) as well since that's part of it
    	listserv_url2 = 'https://listserv.dartmouth.edu/scripts/wa.exe?A1=ind' + str(last_year) + str(padded_last_month) + letter_for_last_week + '&L=CAMPUS-EVENTS&O=D&H=0&D=1&T=1'
 
+   	#same comments as above for this loop
 	r = requests.get(listserv_url2)
 	soup3 = BeautifulSoup(r.text)
 	iterator = 0
@@ -83,7 +86,7 @@ def get_content():
    				iterator = iterator + 1
 	return events
 
-def get_event(event_url):
+def get_event(event_url): # This method returns all the relevant information for a specific event URL given
 	#initialize vars
 	url = ''
 	txt = ''
@@ -96,21 +99,23 @@ def get_event(event_url):
 	soup = BeautifulSoup(r.text)
 
 	#get subject, from, and date
-	event_subject = soup.find(text="Subject:").findNext('a').contents[0]
-	event_from = soup.find(text="From:").findNext('p').contents[0].replace('<','')
-	date = soup.find(text="Date:").findNext('p').contents[0].replace('<','')
-	utc_dt = datetime.strptime(date.replace(' +0000',''),'%a, %d %b %Y %H:%M:%S').replace(tzinfo=pytz.utc)
+	event_subject = soup.find(text="Subject:").findNext('a').contents[0]			# finds subject of event
+	event_from = soup.find(text="From:").findNext('p').contents[0].replace('<','')  # finds from of event
+	date = soup.find(text="Date:").findNext('p').contents[0].replace('<','') 		# finds date of blitz sent out
+
+	#formats the date (NOTE: there's a bug where some events don't have +0000 but -4000, which throws an error)
+	utc_dt = datetime.strptime(date.replace(' +0000',''),'%a, %d %b %Y %H:%M:%S').replace(tzinfo=pytz.utc) #
 	loc_dt = utc_dt.astimezone(timezone('US/Eastern'))
 	event_date = loc_dt.strftime('%A, %b %d %I:%M%p')
 
-	#get txt
+	#get txt by starting a new request from the link to text/plain
 	for link in soup.find_all('a'):
 		if (link.get('href')):
 			if (link.text == 'text/plain'):
 				url = link.get('href')
 				break
 	if (url != ''):
-		r = requests.get('https://listserv.dartmouth.edu'+url)
+		r = requests.get('https://listserv.dartmouth.edu'+url) # makes a new request to get the text from the URL that outputs plaintext
 		soup = BeautifulSoup(r.text)
 		for pre in soup.find_all('pre'):
 			txt = pre.text

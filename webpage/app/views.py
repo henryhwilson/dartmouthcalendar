@@ -4,6 +4,7 @@ from datetime import date
 from app import app
 from scrape import get_content, get_event
 from datetime import datetime
+import urllib
 
 @app.route('/')
 @app.route('/index')
