@@ -2,7 +2,7 @@ from flask import render_template, abort, request
 from calendar import Calendar
 from datetime import date
 from app import app
-from scrape import get_content, get_event
+from scrape import get_content, get_event, get_event2, get_content2
 from datetime import datetime
 import urllib
 
@@ -27,9 +27,25 @@ def index():
 	events.append(event4)
 	event5 = {'from':'Dartmouth Classical Ballet Theatre','subject':'open ballet class on Saturday!','category':'Misc','time_event':'10-11:30AM','date_event':'tomorrow'}
 	events.append(event5)
-	nicknames = {'Delta Delta Delta':'TriDelt','Kappa Kappa Gamma':'KKG','Alpha Delta':'AD',
-	'Sigma Phi Epsilon':'SigEp','Alpha Chi Alpha':'AXA','Beta Alpha Omega':'Beta','Chi Heorot':'Heorot',
-	'Collis Governing Board':'One Wheelock','Kappa Kappa Kappa':'Tri-Kap'}
+	nicknames = {
+		'Delta Delta Delta':'TriDelt',
+		'Kappa Kappa Gamma':'Kappa',
+		'Alpha Delta':'AD',
+		'Sigma Phi Epsilon':'SigEp',
+		'Alpha Chi Alpha':'Alpha Chi',
+		'AXA':'Alpha Chi', 
+		'Beta Alpha Omega':'Beta',
+		'Chi Heorot':'Heorot',
+		'Collis Governing Board':'Collis',
+		'Kappa Kappa Kappa':'Tri-Kap',
+		'Kappa Delta':'KD',
+		'Epsilon Kappa Theta': 'EKT',
+		'Sigma Alpha Epsilon':'SAE',
+		'Psi Upsilon': 'Psi U',
+		'Zeta Psi': 'Zete',
+		'Phi Delta Alpha': 'Phi Delt',
+		'Alpha Xi Delta': 'AZD'
+		}
 	today_total_events = 0
 	today_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Misc':0}
 	tomorrow_total_events = 0
@@ -48,6 +64,7 @@ def index():
 			upcoming_total_events += 1
 		if (not event['from'] in nicknames.keys()):
 			nicknames[event['from']] = event['from']
+
 	if hourNow < 19 and hourNow > 4: # Display "Tonight" if between 7:00PM and 4:59AM
 		isDay = True
 	else:
@@ -55,6 +72,63 @@ def index():
 	return render_template('index.html', is_day=isDay, categories=categories, today_cat_freq=today_cat_freq, 
 		tomorrow_cat_freq=tomorrow_cat_freq, upcoming_cat_freq=upcoming_cat_freq,
 		events=events, today_total_events=today_total_events, tomorrow_total_events=tomorrow_total_events,
+		upcoming_total_events=upcoming_total_events, nicknames=nicknames)
+
+@app.route('/test')
+def test():
+	hourNow = datetime.now().hour
+	categories = []
+	categories.append('Greek')
+	categories.append('Social')
+	categories.append('Sports')
+	categories.append('Misc')
+	nicknames = {
+		'Delta Delta Delta':'TriDelt',
+		'Kappa Kappa Gamma':'Kappa',
+		'Alpha Delta':'AD',
+		'Sigma Phi Epsilon':'SigEp',
+		'Alpha Chi Alpha':'Alpha Chi',
+		'AXA':'Alpha Chi', 
+		'Beta Alpha Omega':'Beta',
+		'Chi Heorot':'Heorot',
+		'Collis Governing Board':'Collis',
+		'Kappa Kappa Kappa':'Tri-Kap',
+		'Kappa Delta':'KD',
+		'Epsilon Kappa Theta': 'EKT',
+		'Sigma Alpha Epsilon':'SAE',
+		'Psi Upsilon': 'Psi U',
+		'Zeta Psi': 'Zete',
+		'Phi Delta Alpha': 'Phi Delt',
+		'Alpha Xi Delta': 'AZD'
+		}
+	realEvents = get_content2()
+
+	today_total_events = 0
+	today_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Misc':0}
+	tomorrow_total_events = 0
+	tomorrow_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Misc':0}
+	upcoming_total_events = 0
+	upcoming_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Misc':0}
+	for event in realEvents:
+		if (event['date_event'] == 'today'):
+			today_cat_freq[event['category']] += 1
+			today_total_events += 1
+		elif (event['date_event'] == 'tomorrow'):
+			tomorrow_cat_freq[event['category']] += 1
+			tomorrow_total_events += 1
+		elif (event['date_event'] == 'upcoming'):
+			upcoming_cat_freq[event['category']] += 1
+			upcoming_total_events += 1
+		if (not event['from'] in nicknames.keys()):
+			nicknames[event['from']] = event['from']
+
+	if hourNow < 19 and hourNow > 4: # Display "Tonight" if between 7:00PM and 4:59AM
+		isDay = True
+	else:
+		isDay = False
+	return render_template('index.html', is_day=isDay, categories=categories, today_cat_freq=today_cat_freq, 
+		tomorrow_cat_freq=tomorrow_cat_freq, upcoming_cat_freq=upcoming_cat_freq,
+		events=realEvents, today_total_events=today_total_events, tomorrow_total_events=tomorrow_total_events,
 		upcoming_total_events=upcoming_total_events, nicknames=nicknames)
 
 @app.route('/scraper', methods=['GET'])
