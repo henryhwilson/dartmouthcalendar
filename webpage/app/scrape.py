@@ -8,7 +8,16 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 
 def get_content():
-	r = requests.get('https://listserv.dartmouth.edu/scripts/wa.exe?A1=ind1410C&L=CAMPUS-EVENTS&O=D&H=0&D=1&T=1')
+	date = datetime.now().date()
+	year = date.year
+	year = year % 2000
+	month = date.month
+	padded_month = ("%02d" % month)
+	day = date.day
+
+	listserv_url = 'https://listserv.dartmouth.edu/scripts/wa.exe?A1=ind' + str(year) + str(padded_month) + 'A&L=CAMPUS-EVENTS&O=D&H=0&D=1&T=1'
+
+	r = requests.get(listserv_url)
 	soup = BeautifulSoup(r.text)
 	events = []
 	iterator = 0
