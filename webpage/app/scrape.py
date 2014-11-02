@@ -3,6 +3,7 @@ import urllib
 import datetime
 import time
 import pytz
+import calendar
 from pytz import timezone
 from datetime import datetime
 from bs4 import BeautifulSoup
@@ -277,6 +278,8 @@ def get_event2(event_url): # This method returns all the relevant information fo
     words = txt.split()
     todayDay = datetime.now().date().day
     messageDay = loc_dt.date().day
+    messageMonth = loc_dt.date().month
+    daysInMessageMonth = calendar.monthrange(loc_dt.date().year, messageMonth)[1]
     thisEvent = None
     for word in words:
         if word.lower() in keywords.keys():
@@ -290,23 +293,28 @@ def get_event2(event_url): # This method returns all the relevant information fo
                 # Check if the event message was sent today or yesterday.
                 if messageDay == todayDay:
                     thisEvent = {'from':event_from,'subject':event_subject,'category':'Sports','time_event':'8PM','date_event':'tomorrow'} 
-                elif messageDay == (todayDay - 1):
+                elif (messageDay == (todayDay - 1)) or (messageDay + 1 == todayDay + daysInMessageMonth):
                     thisEvent = {'from':event_from,'subject':event_subject,'category':'Social','time_event':'9PM','date_event':'today'}
             elif isint(classifier) and (int("0") <= int(classifier) <= int("6")):
                 # check if the soonest occurence of that day of the week 
                 # hasn't happened yet and see how many days away that event is.
+
+                # Need to deal with month overlaps
                 eventDayofWeek = int(classifier)
-                daysFromMessage = eventDayofWeek - loc_dt.date().weekday() % 7
+                daysFromMessage = (eventDayofWeek - loc_dt.date().weekday()) % 7
                 eventDay = messageDay + daysFromMessage
+                if datetime.now().date().month > messageMonth:
+                    eventDay = eventDay - daysInMessageMonth
+
                 if eventDay == todayDay:
                     thisEvent = {'from':event_from,'subject':event_subject,
                     'category':'Greek','time_event':'7PM','date_event':'today'}
                 elif eventDay == todayDay + 1:
                     thisEvent = {'from':event_from,'subject':event_subject,
                     'category':'Social','time_event':'9PM','date_event':'tomorrow'}
-                elif eventDay > todayDay:
+                elif eventDay > todayDay and datetime.now().date().month<=messageMonth:
                     thisEvent = {'from':event_from,'subject':event_subject,
-                    'category':'Sports','time_event':'7PM','date_event':'upcoming'}
+                    'category':'Sports','time_event':'8PM','date_event':'upcoming'}
 
 
     #return all
