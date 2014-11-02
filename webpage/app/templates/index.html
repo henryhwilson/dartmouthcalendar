@@ -12,7 +12,7 @@
 			{% if today_cat_freq[category] > 0 %}
 			{% set printed = 0 %}
 			<li><span class="title" id="title-today-{{ category}}"><b>{{ category }}:</b> {{ today_cat_freq[category] }} event{{ 's' if today_cat_freq[category] != 1 else '' }}</span> <span class="locations">
-			{% for event in events %}{% if event['category'] == category and event['date_event'] == 'today' %}{% if printed == 0 %}(<span id="event-location">{{nicknames[event['from']]}}</span>{% else %}, <span id="event-location">{{ nicknames[event['from']] }}</span>{% endif %}{% if printed + 1 == today_cat_freq[category] %}){% endif %}{% set printed = printed + 1 %}{% endif %}{% endfor %}</span>
+			{% for event in events %}{% if event['category'] == category and event['date_event'] == 'today' %}{% if printed == 0 %}(<span id="event-location">{{nicknames[event['from']].strip()}}</span>{% else %}, <span id="event-location">{{ nicknames[event['from']] }}</span>{% endif %}{% if printed + 1 == today_cat_freq[category] %}){% endif %}{% set printed = printed + 1 %}{% endif %}{% endfor %}</span>
 			<ul id="expanded-today-{{ category }}" {% if today_total_events > 4 %}style="display: none"{% endif %}>
 			{% for event in events %}
 			{% if event['category'] == category and event['date_event'] == 'today' %}

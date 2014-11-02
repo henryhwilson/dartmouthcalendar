@@ -15,26 +15,25 @@
 		<link rel="shortcut icon" type="image/ico" href="../static/Dlogo.jpg" />
 		<script src="../static/js/jquery.min.js"></script>
 	</head>
-
 	<body>
-
-		<div class="sidebar">
-			<ul>
-				<li><a href="#add_event">add event</a></li>
-				<li><a href="#unsubscribe_listserv">unsubscribe from listserv</a></li>
-				<li><a href="#faq">faq</a></li>
-			</ul>
-		</div>	
-
+		<div class="titlebar">
+		<div id="main_title"><a href="/index">DARTMOUTH CALENDAR</a> </div>
+		<div id="nav_links" style="background-color: inherit">
+		<ul>
+		<li><a href="">Add Event</a></li>
+		<li><a href="">Unsubscribe from ListServ</a></li>
+		<li><a href="">FAQ</a></li>
+		</ul>
+		</div>
+<!-- 		<h2>&ldquo;the blitz machine&rdquo;</h2>
+ -->	</div>
+ 		<div class="content">
 		<div class="events">
-
-		<h1 id="main_title"><a href="/index">DARTMOUTH CALENDAR</a></h1>
-		<h2>&ldquo;the blitz machine&rdquo;</h2>
-
 		{% block content %}{% endblock %}
-
+		</div>
+		</div>
 		<div class="footer">
-last blitz received : 26 minutes ago
+Last Blitz: 26 minutes ago
 </div>
 <script>
 $( "#tomorrow" ).click(function() {

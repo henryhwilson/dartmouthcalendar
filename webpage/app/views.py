@@ -25,6 +25,16 @@ def index():
 	events.append(event3)
 	event4 = {'from':'Kappa Kappa Kappa','subject':'Tri-Kap Dance Party @ 11:30','category':'Greek','time_event':'11:30PM','date_event':'tomorrow'}
 	events.append(event4)
+	event4a = {'from':'Kappa Kappa Kappa','subject':'Tri-Kap Dance Party @ 11:30','category':'Greek','time_event':'11:30PM','date_event':'tomorrow'}
+	events.append(event4a)
+	event4b = {'from':'Kappa Kappa Kappa','subject':'Tri-Kap Dance Party @ 11:30','category':'Greek','time_event':'11:30PM','date_event':'tomorrow'}
+	events.append(event4b)
+	event4c = {'from':'Kappa Kappa Kappa','subject':'Tri-Kap Dance Party @ 11:30','category':'Greek','time_event':'11:30PM','date_event':'tomorrow'}
+	events.append(event4c)
+	event4d = {'from':'Kappa Kappa Kappa','subject':'Tri-Kap Dance Party @ 11:30','category':'Greek','time_event':'11:30PM','date_event':'tomorrow'}
+	events.append(event4d)
+	event4e = {'from':'Kappa Kappa Kappa','subject':'Tri-Kap Dance Party @ 11:30','category':'Greek','time_event':'11:30PM','date_event':'tomorrow'}
+	events.append(event4e)
 	event5 = {'from':'Dartmouth Classical Ballet Theatre','subject':'open ballet class on Saturday!','category':'Misc','time_event':'10-11:30AM','date_event':'tomorrow'}
 	events.append(event5)
 	nicknames = {
