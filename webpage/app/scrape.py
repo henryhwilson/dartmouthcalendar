@@ -8,6 +8,12 @@ from pytz import timezone
 from datetime import datetime
 from bs4 import BeautifulSoup
 
+# TO DO
+# [Errno 32] Broken pipe - error
+# -4000 on time.
+# Scrape time and location.
+# Make scraping faster and more efficient
+
 # Helper function that checks if a string can be converted to an int.
 def isint(s):
     try: 
@@ -24,7 +30,7 @@ def get_content(): #returns a list of recent blitzes
     month = date.month
     padded_month = ("%02d" % month)
     day = date.day
-    week_of_month = (day + 6/7)
+    week_of_month = ((day + 6)/7)
     letter_for_week = chr(ord('a') + week_of_month - 1) # first week is A, etc.
 
     last_year = year
@@ -146,7 +152,7 @@ def get_content2(): #returns a list of recent blitzes
     month = date.month
     padded_month = ("%02d" % month)
     day = date.day
-    week_of_month = (day + 6/7)
+    week_of_month = ((day + 6)/7)
     letter_for_week = chr(ord('a') + week_of_month - 1) # first week is A, etc.
 
     last_year = year
@@ -201,7 +207,7 @@ def get_content2(): #returns a list of recent blitzes
     # h: yeah that'd be good! also might want to get the "from" field (who the event was sent from) as well since that's part of it
     listserv_url2 = 'https://listserv.dartmouth.edu/scripts/wa.exe?A1=ind' + str(last_year) + str(padded_last_month) + letter_for_last_week + '&L=CAMPUS-EVENTS&O=D&H=0&D=1&T=1'
 
-       #same comments as above for this loop
+    #same comments as above for this loop
     r = requests.get(listserv_url2)
     soup3 = BeautifulSoup(r.text)
     iterator = 0
@@ -301,6 +307,8 @@ def get_event2(event_url): # This method returns all the relevant information fo
 
                 # Need to deal with month overlaps
                 eventDayofWeek = int(classifier)
+
+                # NOTE:make sure the numbers for this day are correct - should it be 0-6 or 1-7?
                 daysFromMessage = (eventDayofWeek - loc_dt.date().weekday()) % 7
                 eventDay = messageDay + daysFromMessage
                 if datetime.now().date().month > messageMonth:
@@ -309,12 +317,14 @@ def get_event2(event_url): # This method returns all the relevant information fo
                 if eventDay == todayDay:
                     thisEvent = {'from':event_from,'subject':event_subject,
                     'category':'Greek','time_event':'7PM','date_event':'today'}
-                elif eventDay == todayDay + 1:
+                elif eventDay == (todayDay + 1):
                     thisEvent = {'from':event_from,'subject':event_subject,
                     'category':'Social','time_event':'9PM','date_event':'tomorrow'}
-                elif eventDay > todayDay and datetime.now().date().month<=messageMonth:
+                elif eventDay > todayDay:
                     thisEvent = {'from':event_from,'subject':event_subject,
                     'category':'Sports','time_event':'8PM','date_event':'upcoming'}
+            if thisEvent:
+                return thisEvent
 
 
     #return all
