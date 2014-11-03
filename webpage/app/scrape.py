@@ -236,7 +236,6 @@ def get_event2(event_url): # This method returns all the relevant information fo
     url = ''
     htmlurl = ''
     txt = ''
-    htmltxt = ''
     data = []
     event_url = ''+urllib.unquote_plus(event_url)
     event_subject = ''
@@ -264,15 +263,9 @@ def get_event2(event_url): # This method returns all the relevant information fo
             if (link.text == 'text/plain'):
                 url = link.get('href')
             if (link.text == 'text/html'):
-                htmlurl = link.get('href')
+                htmlurl = 'https://listserv.dartmouth.edu'+ link.get('href')
             if (url !='') and (htmlurl != ''):
                 break
-
-    if (htmlurl != ''):
-        r = requests.get('https://listserv.dartmouth.edu'+htmlurl) # makes a new request to get the text from the URL that outputs plaintext
-        soup = BeautifulSoup(r.text)
-        for pre in soup.find_all('pre'):
-            htmltxt = pre.text
 
     if (url != ''):
         r = requests.get('https://listserv.dartmouth.edu'+url) # makes a new request to get the text from the URL that outputs plaintext
@@ -312,13 +305,13 @@ def get_event2(event_url): # This method returns all the relevant information fo
                 # check if the event message was sent today
                 if messageDay == todayDay:
                     thisEvent = {'from':event_from,'subject':event_subject,
-                    'category':'Greek','time_event':'7PM','date_event':'today', 'html':htmltxt} 
+                    'category':'Greek','time_event':'7PM','date_event':'today', 'html':htmlurl} 
             elif classifier == "tomorrow":
                 # Check if the event message was sent today or yesterday.
                 if messageDay == todayDay:
-                    thisEvent = {'from':event_from,'subject':event_subject,'category':'Sports','time_event':'8PM','date_event':'tomorrow', 'html':htmltxt} 
+                    thisEvent = {'from':event_from,'subject':event_subject,'category':'Sports','time_event':'8PM','date_event':'tomorrow', 'html':htmlurl} 
                 elif (messageDay == (todayDay - 1)) or (messageDay + 1 == todayDay + daysInMessageMonth):
-                    thisEvent = {'from':event_from,'subject':event_subject,'category':'Social','time_event':'9PM','date_event':'today', 'html':htmltxt}
+                    thisEvent = {'from':event_from,'subject':event_subject,'category':'Social','time_event':'9PM','date_event':'today', 'html':htmlurl}
             
             # If the word implies a day of the week.
             elif isint(classifier) and (int("0") <= int(classifier) <= int("6")):
@@ -335,13 +328,13 @@ def get_event2(event_url): # This method returns all the relevant information fo
 
                 if eventDay == todayDay:
                     thisEvent = {'from':event_from,'subject':event_subject,
-                    'category':'Greek','time_event':'7PM','date_event':'today', 'html':htmltxt}
+                    'category':'Greek','time_event':'7PM','date_event':'today', 'html':htmlurl}
                 elif eventDay == (todayDay + 1):
                     thisEvent = {'from':event_from,'subject':event_subject,
-                    'category':'Social','time_event':'9PM','date_event':'tomorrow', 'html':htmltxt}
+                    'category':'Social','time_event':'9PM','date_event':'tomorrow', 'html':htmlurl}
                 elif eventDay > todayDay:
                     thisEvent = {'from':event_from,'subject':event_subject,
-                    'category':'Sports','time_event':'8PM','date_event':'upcoming', 'html':htmltxt}
+                    'category':'Sports','time_event':'8PM','date_event':'upcoming', 'html':htmlurl}
 
             # Return the event if it contained an event date.
             if thisEvent:
