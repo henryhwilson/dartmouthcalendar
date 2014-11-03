@@ -6,6 +6,7 @@ body {
     background-attachment: fixed;
 	border-radius: 5px;
 	margin-bottom: 33px;
+	font-size: 0.8em;
 }
 
 .titlebar {
@@ -15,6 +16,9 @@ body {
 	padding-bottom: 10px;
 	margin-bottom: -10px;
 	background: inherit;
+	width: 100%;
+		min-width: 1050px;
+
 }
 
 .titlebar a {
@@ -72,42 +76,6 @@ body {
     content: " | ";
 }
 
-.circle {
-    width:80px;
-    height:40px;
-    font-size:20px;
-    color:white;
-    line-height:40px;
-    text-align:center;
-    border: 2px solid red;
-	-moz-border-radius: 100px / 50px;
-	-webkit-border-radius: 100px / 50px;
-	border-radius: 100px / 50px;
-}
-
-h2 {
-	color: white;
-	font-family: courier;
-	margin-left: 20px;
-	margin-top: 0;
-}
-
-.sidebar {
-	position: fixed;
-	right: 0;
-	top: 0;
-	height: 100%;
-	padding-right: 0;
-	padding-left: 10px;
-	padding-bottom: 50px;
-	padding-top: 100px;
-	width: 20%;
-	font-family: verdana;
-	font-size: 2em;
-	background-color: green;
-	color: white;
-}
-
 .content {
 	background-color: white;
 	height: 100%;
@@ -121,7 +89,7 @@ h2 {
 }
 
 .events {
-	width: 70%;
+	width: 100%;
 	padding-left: 20px;
 	padding-top: 100px;
 	margin-top: 0;
@@ -148,23 +116,15 @@ h2 {
 	display: none;
 }
 
-.events-now-1, .events-tomorrow-1, .events-upcoming-1 {
-	padding-top: 0;
-	margin-top: 0;
-}
 .events .title, .events .in-progess, .events .locations {
 	font-family: courier;
-}
-.events .title {
 	font-size: 1.5em;
 }
-.events .in-progess {
-	font-size: 1.5em;
-}
+
 .events .locations {
-	font-size: 1.5em;
 	color: red;
 }
+
 .events ul {
 	list-style-type: none;
 	margin: 0;
