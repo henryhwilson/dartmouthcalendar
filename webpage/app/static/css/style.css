@@ -79,22 +79,25 @@ body {
 .content {
 	background-color: white;
 	height: 100%;
-	min-height: 548px;
 	margin-left: 12px;
 	margin-right: 12px;
 	margin-top: 0;
-	padding-top: 0;
+	margin-bottom: 30px;
 	border-bottom-left-radius: 15px;
 	border-bottom-right-radius: 15px;
-}
-
-.events {
-	width: 100%;
+	min-height: 450px;
 	padding-left: 20px;
 	padding-top: 100px;
-	margin-top: 0;
-	margin-bottom: 30px;
-	min-height: 500px;
+}
+
+.content .indent-bold {
+	margin-left: 20px;
+	background-color: #e6e6e6;
+	display: inline-block;
+}
+
+.webpage {
+	width: 90%;
 }
 
 .events a {
@@ -151,6 +154,18 @@ body {
 
 .events .highlight .host {
 	background-color:#e6e6e6;
+}
+
+.content h2 {
+	font-size: 1.8em;
+	font-family: verdana;
+	padding-top: 0;
+	margin-top: 0;
+}
+
+.content p {
+	font-size: 1.4em;
+	font-family: verdana;
 }
 
 .footer {

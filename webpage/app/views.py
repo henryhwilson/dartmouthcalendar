@@ -84,6 +84,18 @@ def index():
 		events=events, today_total_events=today_total_events, tomorrow_total_events=tomorrow_total_events,
 		upcoming_total_events=upcoming_total_events, nicknames=nicknames)
 
+@app.route('/add_event')
+def add_event():
+	return render_template('addevent.html')
+
+@app.route('/unsubscribe')
+def unsubscribe():
+	return render_template('unsubscribe.html')
+
+@app.route('/faq')
+def faq():
+	return render_template('faq.html')
+
 @app.route('/test')
 def test():
 	hourNow = datetime.now().hour
