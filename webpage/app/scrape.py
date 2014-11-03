@@ -263,7 +263,7 @@ def get_event2(event_url): # This method returns all the relevant information fo
             if (link.text == 'text/plain'):
                 url = link.get('href')
             if (link.text == 'text/html'):
-                htmlurl = 'https://listserv.dartmouth.edu'+ link.get('href')
+                htmlurl = urllib.quote_plus('https://listserv.dartmouth.edu'+ link.get('href'))
             if (url !='') and (htmlurl != ''):
                 break
 
