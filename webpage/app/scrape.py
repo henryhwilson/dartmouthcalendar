@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 # -4000 on time.
 # Scrape time and location.
 # Make scraping faster and more efficient
+# incorporate database and get rid of only getting 10 events.
 
 # Helper function that checks if a string can be converted to an int.
 def isint(s):
@@ -22,6 +23,7 @@ def isint(s):
     except ValueError:
         return False
 
+#get_content2 and get_event2 are now the functions that I am using.
 def get_content(): #returns a list of recent blitzes
     # Get the month and week of month of today.
     date = datetime.now().date() 
@@ -128,7 +130,7 @@ def get_event(event_url): # This method returns all the relevant information for
     #get txt by starting a new request from the link to text/plain
     for link in soup.find_all('a'):
         if (link.get('href')):
-            if (link.text == 'text/plain'):
+            if (link.text == 'text/plain'): #text/html, get this url and pass it in to the view.py
                 url = link.get('href')
                 break
     if (url != ''):
@@ -178,7 +180,6 @@ def get_content2(): #returns a list of recent blitzes
 
     r = requests.get(listserv_url) # stores url response in var "r"
     soup = BeautifulSoup(r.text) # stores url response in a BeautifulSoup object for later parsing
-    events = [] # initialize vars
     realEvents = []
     iterator = 0
     for link in soup.find_all('a'): # go through every link from the url
@@ -187,19 +188,18 @@ def get_content2(): #returns a list of recent blitzes
         href = link.get('href') # href now holds the href of the link
         if href: # if href isn't None
             if  '/scripts/wa.exe?A1=' in href: # if href contains this string, it's what we're looking for
-                   r = requests.get('https://listserv.dartmouth.edu'+href) # makes a new request from this link
-                   soup2 = BeautifulSoup(r.text) # puts it into beautifulsoup format
-                   for event in soup2.find_all('a'): # for all of the links on this page
-                       if event.get('href'):
-                           if '/scripts/wa.exe?A2=' in event.get('href'):
-                               data = []
-                               data.append(event.text) # add the event title
-                               data.append(urllib.quote_plus(event.get('href'))) # add the url for the event
-                               newEvent = get_event2(urllib.quote_plus(event.get('href')))
-                               events.append(data)
-                               if newEvent:
-                                   realEvents.append(newEvent)
-                   iterator = iterator + 1
+                r = requests.get('https://listserv.dartmouth.edu'+href) # makes a new request from this link
+                soup2 = BeautifulSoup(r.text) # puts it into beautifulsoup format
+                for event in soup2.find_all('a'): # for all of the links on this page
+                    if event.get('href'):
+                        if '/scripts/wa.exe?A2=' in event.get('href'):
+                            newEvent = get_event2(urllib.quote_plus(event.get('href')))
+                            if newEvent:
+                                realEvents.append(newEvent)
+                            #TESTING - only get 10 events
+                            if len(realEvents) >= 6:
+                                return realEvents
+                iterator = iterator + 1
 
     # Scrape for last week
     # NOTE: I will move this soup/link/event/iterator stuff into a separate function,
@@ -217,25 +217,26 @@ def get_content2(): #returns a list of recent blitzes
         href = link.get('href')
         if href:
             if  '/scripts/wa.exe?A1=' in href:
-                   r = requests.get('https://listserv.dartmouth.edu'+href)
-                   soup4 = BeautifulSoup(r.text)
-                   for event in soup4.find_all('a'):
-                       if event.get('href'):
-                           if '/scripts/wa.exe?A2=' in event.get('href'):
-                               data = []
-                               data.append(event.text)
-                               data.append(urllib.quote_plus(event.get('href')))
-                               newEvent = get_event2(urllib.quote_plus(event.get('href')))
-                               events.append(data)
-                               if newEvent:
-                                   realEvents.append(newEvent)
-                   iterator = iterator + 1
+                r = requests.get('https://listserv.dartmouth.edu'+href)
+                soup4 = BeautifulSoup(r.text)
+                for event in soup4.find_all('a'):
+                    if event.get('href'):
+                        if '/scripts/wa.exe?A2=' in event.get('href'):
+                            newEvent = get_event2(urllib.quote_plus(event.get('href')))
+                            if newEvent:
+                                realEvents.append(newEvent)
+                            # TESTING - only get 10 events
+                            if len(realEvents) >= 6:
+                                return realEvents
+                iterator = iterator + 1
     return realEvents
 
 def get_event2(event_url): # This method returns all the relevant information for a specific event URL given
     #initialize vars
     url = ''
+    htmlurl = ''
     txt = ''
+    htmltxt = ''
     data = []
     event_url = ''+urllib.unquote_plus(event_url)
     event_subject = ''
@@ -251,7 +252,7 @@ def get_event2(event_url): # This method returns all the relevant information fo
 
     #formats the date (NOTE: there's a bug where some events don't have +0000 but -4000, which throws an error)
     try:
-    	utc_dt = datetime.strptime(date.replace(' +0000',''),'%a, %d %b %Y %H:%M:%S').replace(tzinfo=pytz.utc) #
+    	utc_dt = datetime.strptime(date.replace(' +0000',''),'%a, %d %b %Y %H:%M:%S').replace(tzinfo=pytz.utc)
     except:
     	return None
     loc_dt = utc_dt.astimezone(timezone('US/Eastern'))
@@ -262,13 +263,24 @@ def get_event2(event_url): # This method returns all the relevant information fo
         if (link.get('href')):
             if (link.text == 'text/plain'):
                 url = link.get('href')
+            if (link.text == 'text/html'):
+                htmlurl = link.get('href')
+            if (url !='') and (htmlurl != ''):
                 break
+
+    if (htmlurl != ''):
+        r = requests.get('https://listserv.dartmouth.edu'+htmlurl) # makes a new request to get the text from the URL that outputs plaintext
+        soup = BeautifulSoup(r.text)
+        for pre in soup.find_all('pre'):
+            htmltxt = pre.text
+
     if (url != ''):
         r = requests.get('https://listserv.dartmouth.edu'+url) # makes a new request to get the text from the URL that outputs plaintext
         soup = BeautifulSoup(r.text)
         for pre in soup.find_all('pre'):
             txt = pre.text
 
+    # Day keywords
     keywords = {'today':"today",
             "tonight":"today",
             "tomorrow":"tomorrow",
@@ -281,48 +293,57 @@ def get_event2(event_url): # This method returns all the relevant information fo
             "sunday":"6"
             }
 
+    # Go through the message day by day.
     words = txt.split()
+
+    # Information about today and about the message.
     todayDay = datetime.now().date().day
     messageDay = loc_dt.date().day
     messageMonth = loc_dt.date().month
     daysInMessageMonth = calendar.monthrange(loc_dt.date().year, messageMonth)[1]
     thisEvent = None
+
+    # Loop through all the words.
     for word in words:
+        # If the word is a keyword.
         if word.lower() in keywords.keys():
             classifier = keywords.get(word.lower())
             if classifier == "today":
                 # check if the event message was sent today
                 if messageDay == todayDay:
                     thisEvent = {'from':event_from,'subject':event_subject,
-                    'category':'Greek','time_event':'7PM','date_event':'today'} 
+                    'category':'Greek','time_event':'7PM','date_event':'today', 'html':htmltxt} 
             elif classifier == "tomorrow":
                 # Check if the event message was sent today or yesterday.
                 if messageDay == todayDay:
-                    thisEvent = {'from':event_from,'subject':event_subject,'category':'Sports','time_event':'8PM','date_event':'tomorrow'} 
+                    thisEvent = {'from':event_from,'subject':event_subject,'category':'Sports','time_event':'8PM','date_event':'tomorrow', 'html':htmltxt} 
                 elif (messageDay == (todayDay - 1)) or (messageDay + 1 == todayDay + daysInMessageMonth):
-                    thisEvent = {'from':event_from,'subject':event_subject,'category':'Social','time_event':'9PM','date_event':'today'}
+                    thisEvent = {'from':event_from,'subject':event_subject,'category':'Social','time_event':'9PM','date_event':'today', 'html':htmltxt}
+            
+            # If the word implies a day of the week.
             elif isint(classifier) and (int("0") <= int(classifier) <= int("6")):
-                # check if the soonest occurence of that day of the week 
-                # hasn't happened yet and see how many days away that event is.
-
                 # Need to deal with month overlaps
                 eventDayofWeek = int(classifier)
 
-                # NOTE:make sure the numbers for this day are correct - should it be 0-6 or 1-7?
+                # Find which day the event is on based on the word and the message date.
                 daysFromMessage = (eventDayofWeek - loc_dt.date().weekday()) % 7
                 eventDay = messageDay + daysFromMessage
+
+                # If the message is from last month.
                 if datetime.now().date().month > messageMonth:
                     eventDay = eventDay - daysInMessageMonth
 
                 if eventDay == todayDay:
                     thisEvent = {'from':event_from,'subject':event_subject,
-                    'category':'Greek','time_event':'7PM','date_event':'today'}
+                    'category':'Greek','time_event':'7PM','date_event':'today', 'html':htmltxt}
                 elif eventDay == (todayDay + 1):
                     thisEvent = {'from':event_from,'subject':event_subject,
-                    'category':'Social','time_event':'9PM','date_event':'tomorrow'}
+                    'category':'Social','time_event':'9PM','date_event':'tomorrow', 'html':htmltxt}
                 elif eventDay > todayDay:
                     thisEvent = {'from':event_from,'subject':event_subject,
-                    'category':'Sports','time_event':'8PM','date_event':'upcoming'}
+                    'category':'Sports','time_event':'8PM','date_event':'upcoming', 'html':htmltxt}
+
+            # Return the event if it contained an event date.
             if thisEvent:
                 return thisEvent
 
