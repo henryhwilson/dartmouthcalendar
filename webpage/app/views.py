@@ -96,9 +96,12 @@ def getEventHTML():
 		headers = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"><html><head><title>LISTSERV 16.0 - CAMPUS-EVENTS Archives</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"><style type=\"text/css\" style=\"display:none\"><!-- p { margin-top: 0px; margin-bottom: 0px; }--></style></head><body style=\"background-color: white\">"
 		headers = headers + "<h2 style=\"font-family: verdana\">Blitz from <em>" + sender + "</em></h2>"
 	else:
-		headers = "<div style=\"background-color: white\">"
+		headers = "<div style=\"background-color: white; height: 100%\">"
 		indexOfDiv = 0
 	output = headers + r.text[indexOfDiv:]
+	while "b-print.png\"" in output:
+		indexOfSrc = output.index("b-print.png")+11
+		output = output[:indexOfSrc] + '' + output[indexOfSrc+1:]
 	while "src=\"" in output:
 		indexOfSrc = output.index("src=\"")+4
 		output = output[:indexOfSrc] + 'https://listserv.dartmouth.edu' + output[indexOfSrc+1:]
