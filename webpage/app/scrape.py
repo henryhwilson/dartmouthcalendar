@@ -248,7 +248,30 @@ def get_event2(event_url): # This method returns all the relevant information fo
     event_subject = soup.find(text="Subject:").findNext('a').contents[0]            # finds subject of event
     event_from = soup.find(text="From:").findNext('p').contents[0].replace('<','')  # finds from of event
     date = soup.find(text="Date:").findNext('p').contents[0].replace('<','')         # finds date of blitz sent out
+    
+    nicknames = {
+        'delta delta delta':'TriDelt',
+        'kappa kappa gamma':'Kappa',
+        'alpha delta':'AD',
+        'sigma phi epsilon':'SigEp',
+        'alpha chi alpha':'Alpha Chi',
+        'alpha chi alpha':'Alpha Chi', 
+        'beta alpha omega':'Beta',
+        'chi heorot':'Heorot',
+        'collis governing board':'Collis',
+        'kappa kappa kappa':'Tri-Kap',
+        'kappa delta':'KD',
+        'epsilon kappa theta': 'EKT',
+        'sigma alpha epsilon':'SAE',
+        'psi upsilon': 'Psi U',
+        'zeta psi': 'Zete',
+        'phi Delta alpha': 'Phi Delt',
+        'alpha xi delta': 'AZD'
+        }
 
+    event_from = event_from.strip()
+    if event_from.lower() in nicknames.keys():
+        event_from = nicknames.get(event_from.lower())
     #formats the date (NOTE: there's a bug where some events don't have +0000 but -4000, which throws an error)
     try:
     	utc_dt = datetime.strptime(date.replace(' +0000',''),'%a, %d %b %Y %H:%M:%S').replace(tzinfo=pytz.utc)

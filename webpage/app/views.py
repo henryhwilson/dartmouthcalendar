@@ -29,25 +29,25 @@ def index():
 	categories.append('Social')
 	categories.append('Sports')
 	categories.append('Misc')
-	nicknames = {
-		'Delta Delta Delta':'TriDelt',
-		'Kappa Kappa Gamma':'Kappa',
-		'Alpha Delta':'AD',
-		'Sigma Phi Epsilon':'SigEp',
-		'Alpha Chi Alpha':'Alpha Chi',
-		'AXA':'Alpha Chi', 
-		'Beta Alpha Omega':'Beta',
-		'Chi Heorot':'Heorot',
-		'Collis Governing Board':'Collis',
-		'Kappa Kappa Kappa':'Tri-Kap',
-		'Kappa Delta':'KD',
-		'Epsilon Kappa Theta': 'EKT',
-		'Sigma Alpha Epsilon':'SAE',
-		'Psi Upsilon': 'Psi U',
-		'Zeta Psi': 'Zete',
-		'Phi Delta Alpha': 'Phi Delt',
-		'Alpha Xi Delta': 'AZD'
-		}
+	# nicknames = {
+	# 	'Delta Delta Delta':'TriDelt',
+	# 	'Kappa Kappa Gamma':'Kappa',
+	# 	'Alpha Delta':'AD',
+	# 	'Sigma Phi Epsilon':'SigEp',
+	# 	'Alpha Chi Alpha':'Alpha Chi',
+	# 	'AXA':'Alpha Chi', 
+	# 	'Beta Alpha Omega':'Beta',
+	# 	'Chi Heorot':'Heorot',
+	# 	'Collis Governing Board':'Collis',
+	# 	'Kappa Kappa Kappa':'Tri-Kap',
+	# 	'Kappa Delta':'KD',
+	# 	'Epsilon Kappa Theta': 'EKT',
+	# 	'Sigma Alpha Epsilon':'SAE',
+	# 	'Psi Upsilon': 'Psi U',
+	# 	'Zeta Psi': 'Zete',
+	# 	'Phi Delta Alpha': 'Phi Delt',
+	# 	'Alpha Xi Delta': 'AZD'
+	# 	}
 	realEvents = get_content2()
 
 	today_total_events = 0
@@ -66,8 +66,8 @@ def index():
 		elif (event['date_event'] == 'upcoming'):
 			upcoming_cat_freq[event['category']] += 1
 			upcoming_total_events += 1
-		if (not event['from'] in nicknames.keys()):
-			nicknames[event['from']] = event['from'].strip()
+		# if (not event['from'] in nicknames.keys()):
+		# 	nicknames[event['from']] = event['from'].strip()
 
 	if hourNow < 19 and hourNow > 4: # Display "Tonight" if between 7:00PM and 4:59AM
 		isDay = True
@@ -76,7 +76,7 @@ def index():
 	return render_template('index.html', is_day=isDay, categories=categories, today_cat_freq=today_cat_freq, 
 		tomorrow_cat_freq=tomorrow_cat_freq, upcoming_cat_freq=upcoming_cat_freq,
 		events=realEvents, today_total_events=today_total_events, tomorrow_total_events=tomorrow_total_events,
-		upcoming_total_events=upcoming_total_events, nicknames=nicknames)
+		upcoming_total_events=upcoming_total_events)
 
 @app.route('/ajax/getEventHTML', methods=['GET'])
 def getEventHTML():
