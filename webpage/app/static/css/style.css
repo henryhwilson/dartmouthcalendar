@@ -17,8 +17,7 @@ body {
 	margin-bottom: -10px;
 	background: inherit;
 	width: 100%;
-		min-width: 1050px;
-
+	min-width: 1050px;
 }
 
 .titlebar a {
@@ -101,6 +100,10 @@ body {
 }
 
 .events a {
+	text-decoration: none;
+	color: black;
+}
+.events #today,#tomorrow,#upcoming {
 	color: #aeaeae;
 	font-size: 1.5em;
 	padding-top: 0;
@@ -111,7 +114,7 @@ body {
 	text-decoration: none;
 	display: block;
 }
-.events a:hover {
+.events #today:hover, #tomorrow:hover,#upcoming:hover {
 	color: #666666;
 }
 

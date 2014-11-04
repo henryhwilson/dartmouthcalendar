@@ -5,6 +5,17 @@
 {% endblock %}
 
 {% block content %}
+<script>
+$(document).ready(function() {
+$('.highlight').magnificPopup({
+  delegate: 'a', // child items selector, by clicking on it popup will open
+  type: 'iframe'
+  // other options
+});
+});	
+  $('#divtagdefaultwrapper').contents().find('#someID').html();
+
+</script>
 		<div class="events">
 		<h2>The Blitz Machine</h2>
 	<a href="#today1" id="today">{% if is_day == False %}tonight{% else %}today{% endif %}</a>
@@ -18,7 +29,7 @@
 			<ul id="expanded-today-{{ category }}" {% if today_total_events > 4 %}style="display: none"{% endif %}>
 			{% for event in events %}
 			{% if event['category'] == category and event['date_event'] == 'today' %}
-			<li><span class="host">{{ event['time_event'] }} {{nicknames[event['from']]}}:</span> <span class="subject">{{event['subject']}}</span></li>
+			<li><a href="ajax/getEventHTML?from={{ nicknames[event['from']]}}&url={{ event['html']}}"><span class="host">{{ event['time_event'] }} {{nicknames[event['from']]}}:</span> <span class="subject">{{event['subject']}}</span></a></li>
 			{% endif %}
 			{% endfor %}
 			</ul>
@@ -38,7 +49,7 @@
 			<ul id="expanded-tomorrow-{{ category }}" {% if tomorrow_total_events > 4 %}style="display: none"{% endif %}>
 			{% for event in events %}
 			{% if event['category'] == category and event['date_event'] == 'tomorrow' %}
-			<li><span class="host">{{ event['time_event'] }} {{nicknames[event['from']]}}:</span> <span class="subject">{{event['subject']}}</span></li>
+						<li><a href="ajax/getEventHTML?from={{ nicknames[event['from']]}}&url={{ event['html']}}"><span class="host">{{ event['time_event'] }} {{nicknames[event['from']]}}:</span> <span class="subject">{{event['subject']}}</span></a></li>
 			{% endif %}
 			{% endfor %}
 			</ul>
@@ -58,7 +69,7 @@
 			<ul id="expanded-upcoming-{{ category }}" {% if upcoming_total_events > 4 %}style="display: none"{% endif %}>
 			{% for event in events %}
 			{% if event['category'] == category and event['date_event'] == 'upcoming' %}
-			<li><span class="host">{{ event['time_event'] }} {{nicknames[event['from']]}}:</span> <span class="subject">{{event['subject']}}</span></li>
+						<li><a href="ajax/getEventHTML?from={{ nicknames[event['from']]}}&url={{ event['html']}}"><span class="host">{{ event['time_event'] }} {{nicknames[event['from']]}}:</span> <span class="subject">{{event['subject']}}</span></a></li>
 			{% endif %}
 			{% endfor %}
 			</ul>
@@ -161,6 +172,7 @@ $( "#title-upcoming-Misc" ).click(function() {
   $("#expanded-upcoming-Sports").hide(0);
   $("#expanded-upcoming-Misc").show(300);
 });
+
 {% endif %}
 </script>
 {% endblock %}

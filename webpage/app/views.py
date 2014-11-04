@@ -4,11 +4,117 @@ from datetime import date
 from app import app
 from scrape import get_content, get_event, get_event2, get_content2
 from datetime import datetime
+from bs4 import BeautifulSoup
+import requests
 import urllib
+
+@app.route('/add_event')
+def add_event():
+	return render_template('addevent.html')
+
+@app.route('/unsubscribe')
+def unsubscribe():
+	return render_template('unsubscribe.html')
+
+@app.route('/faq')
+def faq():
+	return render_template('faq.html')
 
 @app.route('/')
 @app.route('/index')
 def index():
+	hourNow = datetime.now().hour
+	categories = []
+	categories.append('Greek')
+	categories.append('Social')
+	categories.append('Sports')
+	categories.append('Misc')
+	nicknames = {
+		'Delta Delta Delta':'TriDelt',
+		'Kappa Kappa Gamma':'Kappa',
+		'Alpha Delta':'AD',
+		'Sigma Phi Epsilon':'SigEp',
+		'Alpha Chi Alpha':'Alpha Chi',
+		'AXA':'Alpha Chi', 
+		'Beta Alpha Omega':'Beta',
+		'Chi Heorot':'Heorot',
+		'Collis Governing Board':'Collis',
+		'Kappa Kappa Kappa':'Tri-Kap',
+		'Kappa Delta':'KD',
+		'Epsilon Kappa Theta': 'EKT',
+		'Sigma Alpha Epsilon':'SAE',
+		'Psi Upsilon': 'Psi U',
+		'Zeta Psi': 'Zete',
+		'Phi Delta Alpha': 'Phi Delt',
+		'Alpha Xi Delta': 'AZD'
+		}
+	realEvents = get_content2()
+
+	today_total_events = 0
+	today_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Misc':0}
+	tomorrow_total_events = 0
+	tomorrow_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Misc':0}
+	upcoming_total_events = 0
+	upcoming_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Misc':0}
+	for event in realEvents:
+		if (event['date_event'] == 'today'):
+			today_cat_freq[event['category']] += 1
+			today_total_events += 1
+		elif (event['date_event'] == 'tomorrow'):
+			tomorrow_cat_freq[event['category']] += 1
+			tomorrow_total_events += 1
+		elif (event['date_event'] == 'upcoming'):
+			upcoming_cat_freq[event['category']] += 1
+			upcoming_total_events += 1
+		if (not event['from'] in nicknames.keys()):
+			nicknames[event['from']] = event['from'].strip()
+
+	if hourNow < 19 and hourNow > 4: # Display "Tonight" if between 7:00PM and 4:59AM
+		isDay = True
+	else:
+		isDay = False
+	return render_template('index.html', is_day=isDay, categories=categories, today_cat_freq=today_cat_freq, 
+		tomorrow_cat_freq=tomorrow_cat_freq, upcoming_cat_freq=upcoming_cat_freq,
+		events=realEvents, today_total_events=today_total_events, tomorrow_total_events=tomorrow_total_events,
+		upcoming_total_events=upcoming_total_events, nicknames=nicknames)
+
+@app.route('/ajax/getEventHTML', methods=['GET'])
+def getEventHTML():
+	url = request.args.get("url")
+	sender = request.args.get("from")
+	date = request.args.get("date")
+	if url == None:
+		return None
+	url = ''+urllib.unquote_plus(url)
+	r = requests.get(url)
+	if "<div id=\"divtagdefaultwrapper\"" in r.text:
+		indexOfDiv = r.text.index("<div id=\"divtagdefaultwrapper\"")
+		headers = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"><html><head><title>LISTSERV 16.0 - CAMPUS-EVENTS Archives</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"><style type=\"text/css\" style=\"display:none\"><!-- p { margin-top: 0px; margin-bottom: 0px; }--></style></head><body style=\"background-color: white\">"
+		headers = headers + "<h2 style=\"font-family: verdana\">Blitz from <em>" + sender + "</em></h2>"
+	elif "</div><meta" in r.text:
+		indexOfDiv = r.text.index("</div><meta")+len("</div>")
+		headers = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"><html><head><title>LISTSERV 16.0 - CAMPUS-EVENTS Archives</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"><style type=\"text/css\" style=\"display:none\"><!-- p { margin-top: 0px; margin-bottom: 0px; }--></style></head><body style=\"background-color: white\">"
+		headers = headers + "<h2 style=\"font-family: verdana\">Blitz from <em>" + sender + "</em></h2>"
+	else:
+		headers = "<div style=\"background-color: white\">"
+		indexOfDiv = 0
+	output = headers + r.text[indexOfDiv:]
+	while "src=\"" in output:
+		indexOfSrc = output.index("src=\"")+4
+		output = output[:indexOfSrc] + 'https://listserv.dartmouth.edu' + output[indexOfSrc+1:]
+	return output
+
+@app.route('/scraper', methods=['GET'])
+def scraper():
+	url = request.args.get("event_url")
+	if (url == None):
+		return_data = get_content()
+	else:
+		return_data = get_event(url)
+	return render_template('scrape.html',data=return_data,event_url=url)
+
+@app.route('/static')
+def static_page():
 	hourNow = datetime.now().hour
 	categories = []
 	categories.append('Greek')
@@ -83,81 +189,3 @@ def index():
 		tomorrow_cat_freq=tomorrow_cat_freq, upcoming_cat_freq=upcoming_cat_freq,
 		events=events, today_total_events=today_total_events, tomorrow_total_events=tomorrow_total_events,
 		upcoming_total_events=upcoming_total_events, nicknames=nicknames)
-
-@app.route('/add_event')
-def add_event():
-	return render_template('addevent.html')
-
-@app.route('/unsubscribe')
-def unsubscribe():
-	return render_template('unsubscribe.html')
-
-@app.route('/faq')
-def faq():
-	return render_template('faq.html')
-
-@app.route('/test')
-def test():
-	hourNow = datetime.now().hour
-	categories = []
-	categories.append('Greek')
-	categories.append('Social')
-	categories.append('Sports')
-	categories.append('Misc')
-	nicknames = {
-		'Delta Delta Delta':'TriDelt',
-		'Kappa Kappa Gamma':'Kappa',
-		'Alpha Delta':'AD',
-		'Sigma Phi Epsilon':'SigEp',
-		'Alpha Chi Alpha':'Alpha Chi',
-		'AXA':'Alpha Chi', 
-		'Beta Alpha Omega':'Beta',
-		'Chi Heorot':'Heorot',
-		'Collis Governing Board':'Collis',
-		'Kappa Kappa Kappa':'Tri-Kap',
-		'Kappa Delta':'KD',
-		'Epsilon Kappa Theta': 'EKT',
-		'Sigma Alpha Epsilon':'SAE',
-		'Psi Upsilon': 'Psi U',
-		'Zeta Psi': 'Zete',
-		'Phi Delta Alpha': 'Phi Delt',
-		'Alpha Xi Delta': 'AZD'
-		}
-	realEvents = get_content2()
-
-	today_total_events = 0
-	today_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Misc':0}
-	tomorrow_total_events = 0
-	tomorrow_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Misc':0}
-	upcoming_total_events = 0
-	upcoming_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Misc':0}
-	for event in realEvents:
-		if (event['date_event'] == 'today'):
-			today_cat_freq[event['category']] += 1
-			today_total_events += 1
-		elif (event['date_event'] == 'tomorrow'):
-			tomorrow_cat_freq[event['category']] += 1
-			tomorrow_total_events += 1
-		elif (event['date_event'] == 'upcoming'):
-			upcoming_cat_freq[event['category']] += 1
-			upcoming_total_events += 1
-		if (not event['from'] in nicknames.keys()):
-			nicknames[event['from']] = event['from']
-
-	if hourNow < 19 and hourNow > 4: # Display "Tonight" if between 7:00PM and 4:59AM
-		isDay = True
-	else:
-		isDay = False
-	return render_template('index.html', is_day=isDay, categories=categories, today_cat_freq=today_cat_freq, 
-		tomorrow_cat_freq=tomorrow_cat_freq, upcoming_cat_freq=upcoming_cat_freq,
-		events=realEvents, today_total_events=today_total_events, tomorrow_total_events=tomorrow_total_events,
-		upcoming_total_events=upcoming_total_events, nicknames=nicknames)
-
-@app.route('/scraper', methods=['GET'])
-def scraper():
-	url = request.args.get("event_url")
-	if (url == None):
-		return_data = get_content()
-	else:
-		return_data = get_event(url)
-	return render_template('scrape.html',data=return_data,event_url=url)
