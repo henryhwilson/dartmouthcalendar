@@ -25,11 +25,11 @@ $('.highlight').magnificPopup({
 			{% if today_cat_freq[category] > 0 %}
 			{% set printed = 0 %}
 			<li><span class="title" id="title-today-{{ category}}"><b>{{ category }}:</b> {{ today_cat_freq[category] }} event{{ 's' if today_cat_freq[category] != 1 else '' }}</span> <span class="locations">
-			{% for event in events %}{% if event['category'] == category and event['date_event'] == 'today' %}{% if printed == 0 %}(<span id="event-location">{{nicknames[event['from']].strip()}}</span>{% else %}, <span id="event-location">{{ nicknames[event['from']] }}</span>{% endif %}{% if printed + 1 == today_cat_freq[category] %}){% endif %}{% set printed = printed + 1 %}{% endif %}{% endfor %}</span>
+			{% for event in events %}{% if event['category'] == category and event['date_event'] == 'today' %}{% if printed == 0 %}(<span id="event-location">{{event['from']}}</span>{% else %}, <span id="event-location">{{ event['from'] }}</span>{% endif %}{% if printed + 1 == today_cat_freq[category] %}){% endif %}{% set printed = printed + 1 %}{% endif %}{% endfor %}</span>
 			<ul id="expanded-today-{{ category }}" {% if today_total_events > 4 %}style="display: none"{% endif %}>
 			{% for event in events %}
 			{% if event['category'] == category and event['date_event'] == 'today' %}
-			<li><a href="ajax/getEventHTML?from={{ nicknames[event['from']]}}&url={{ event['html']}}"><span class="host">{{ event['time_event'] }} {{nicknames[event['from']]}}:</span> <span class="subject">{{event['subject']}}</span></a></li>
+			<li><a href="ajax/getEventHTML?from={{ event['from']}}&url={{ event['html']}}"><span class="host">{{ event['time_event'] }} {{event['from']}}:</span> <span class="subject">{{event['subject']}}</span></a></li>
 			{% endif %}
 			{% endfor %}
 			</ul>
@@ -45,11 +45,11 @@ $('.highlight').magnificPopup({
 			{% if tomorrow_cat_freq[category] > 0 %}
 			{% set printed = 0 %}
 			<li><span class="title" id="title-tomorrow-{{ category}}"><b>{{ category }}:</b> {{ tomorrow_cat_freq[category] }} event{{ 's' if tomorrow_cat_freq[category] != 1 else '' }}</span> <span class="locations">
-			{% for event in events %}{% if event['category'] == category and event['date_event'] == 'tomorrow' %}{% if printed == 0 %}(<span id="event-location">{{nicknames[event['from']]}}</span>{% else %}, <span id="event-location">{{ nicknames[event['from']] }}</span>{% endif %}{% if printed + 1 == tomorrow_cat_freq[category] %}){% endif %}{% set printed = printed + 1 %}{% endif %}{% endfor %}</span>
+			{% for event in events %}{% if event['category'] == category and event['date_event'] == 'tomorrow' %}{% if printed == 0 %}(<span id="event-location">{{event['from']}}</span>{% else %}, <span id="event-location">{{ event['from'] }}</span>{% endif %}{% if printed + 1 == tomorrow_cat_freq[category] %}){% endif %}{% set printed = printed + 1 %}{% endif %}{% endfor %}</span>
 			<ul id="expanded-tomorrow-{{ category }}" {% if tomorrow_total_events > 4 %}style="display: none"{% endif %}>
 			{% for event in events %}
 			{% if event['category'] == category and event['date_event'] == 'tomorrow' %}
-						<li><a href="ajax/getEventHTML?from={{ nicknames[event['from']]}}&url={{ event['html']}}"><span class="host">{{ event['time_event'] }} {{nicknames[event['from']]}}:</span> <span class="subject">{{event['subject']}}</span></a></li>
+						<li><a href="ajax/getEventHTML?from={{ event['from']}}&url={{ event['html']}}"><span class="host">{{ event['time_event'] }} {{event['from']}}:</span> <span class="subject">{{event['subject']}}</span></a></li>
 			{% endif %}
 			{% endfor %}
 			</ul>
@@ -65,11 +65,11 @@ $('.highlight').magnificPopup({
 			{% if upcoming_cat_freq[category] > 0 %}
 			{% set printed = 0 %}
 			<li><span class="title" id="title-upcoming-{{ category}}"><b>{{ category }}:</b> {{ upcoming_cat_freq[category] }} event{{ 's' if upcoming_cat_freq[category] != 1 else '' }}</span> <span class="locations">
-			{% for event in events %}{% if event['category'] == category and event['date_event'] == 'upcoming' %}{% if printed == 0 %}(<span id="event-location">{{nicknames[event['from']]}}</span>{% else %}, <span id="event-location">{{ nicknames[event['from']] }}</span>{% endif %}{% if printed + 1 == upcoming_cat_freq[category] %}){% endif %}{% set printed = printed + 1 %}{% endif %}{% endfor %}</span>
+			{% for event in events %}{% if event['category'] == category and event['date_event'] == 'upcoming' %}{% if printed == 0 %}(<span id="event-location">{{event['from']}}</span>{% else %}, <span id="event-location">{{ event['from'] }}</span>{% endif %}{% if printed + 1 == upcoming_cat_freq[category] %}){% endif %}{% set printed = printed + 1 %}{% endif %}{% endfor %}</span>
 			<ul id="expanded-upcoming-{{ category }}" {% if upcoming_total_events > 4 %}style="display: none"{% endif %}>
 			{% for event in events %}
 			{% if event['category'] == category and event['date_event'] == 'upcoming' %}
-						<li><a href="ajax/getEventHTML?from={{ nicknames[event['from']]}}&url={{ event['html']}}"><span class="host">{{ event['time_event'] }} {{nicknames[event['from']]}}:</span> <span class="subject">{{event['subject']}}</span></a></li>
+						<li><a href="ajax/getEventHTML?from={{ event['from']}}&url={{ event['html']}}"><span class="host">{{ event['time_event'] }} {{event['from']}}:</span> <span class="subject">{{event['subject']}}</span></a></li>
 			{% endif %}
 			{% endfor %}
 			</ul>
