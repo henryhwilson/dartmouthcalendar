@@ -255,7 +255,6 @@ def get_event2(event_url): # This method returns all the relevant information fo
         'alpha delta':'AD',
         'sigma phi epsilon':'SigEp',
         'alpha chi alpha':'Alpha Chi',
-        'alpha chi alpha':'Alpha Chi', 
         'beta alpha omega':'Beta',
         'chi heorot':'Heorot',
         'collis governing board':'Collis',
