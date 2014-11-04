@@ -304,14 +304,14 @@ def get_event2(event_url): # This method returns all the relevant information fo
             if classifier == "today":
                 # check if the event message was sent today
                 if messageDay == todayDay:
-                    thisEvent = {'from':event_from,'subject':event_subject,
+                    thisEvent = {'from':event_from,'subject':event_subject, 'blitz_date':loc_dt,
                     'category':'Greek','time_event':'7PM','date_event':'today', 'html':htmlurl} 
             elif classifier == "tomorrow":
                 # Check if the event message was sent today or yesterday.
                 if messageDay == todayDay:
-                    thisEvent = {'from':event_from,'subject':event_subject,'category':'Sports','time_event':'8PM','date_event':'tomorrow', 'html':htmlurl} 
+                    thisEvent = {'from':event_from,'subject':event_subject, 'blitz_date':loc_dt,'category':'Sports','time_event':'8PM','date_event':'tomorrow', 'html':htmlurl} 
                 elif (messageDay == (todayDay - 1)) or (messageDay + 1 == todayDay + daysInMessageMonth):
-                    thisEvent = {'from':event_from,'subject':event_subject,'category':'Social','time_event':'9PM','date_event':'today', 'html':htmlurl}
+                    thisEvent = {'from':event_from,'subject':event_subject, 'blitz_date':loc_dt,'category':'Social','time_event':'9PM','date_event':'today', 'html':htmlurl}
             
             # If the word implies a day of the week.
             elif isint(classifier) and (int("0") <= int(classifier) <= int("6")):
@@ -327,13 +327,13 @@ def get_event2(event_url): # This method returns all the relevant information fo
                     eventDay = eventDay - daysInMessageMonth
 
                 if eventDay == todayDay:
-                    thisEvent = {'from':event_from,'subject':event_subject,
+                    thisEvent = {'from':event_from,'subject':event_subject, 'blitz_date':loc_dt,
                     'category':'Greek','time_event':'7PM','date_event':'today', 'html':htmlurl}
                 elif eventDay == (todayDay + 1):
-                    thisEvent = {'from':event_from,'subject':event_subject,
+                    thisEvent = {'from':event_from,'subject':event_subject, 'blitz_date':loc_dt,
                     'category':'Social','time_event':'9PM','date_event':'tomorrow', 'html':htmlurl}
                 elif eventDay > todayDay:
-                    thisEvent = {'from':event_from,'subject':event_subject,
+                    thisEvent = {'from':event_from,'subject':event_subject, 'blitz_date':loc_dt,
                     'category':'Sports','time_event':'8PM','date_event':'upcoming', 'html':htmlurl}
 
             # Return the event if it contained an event date.
