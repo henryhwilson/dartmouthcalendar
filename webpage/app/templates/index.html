@@ -19,8 +19,9 @@ $(document).ready(function() {
 	    cache: false,
 	   // data: formData,
 	    success: function(data) {
+	    	$('div.events').hide();
 			$('div.events').html(current+data);
-
+			$('div.events').fadeIn();
 			$('.highlight').magnificPopup({
 			  delegate: 'a', // child items selector, by clicking on it popup will open
 			  type: 'iframe'
@@ -37,9 +38,9 @@ $(document).ready(function() {
 });	
   $('#divtagdefaultwrapper').contents().find('#someID').html();
 
-</script>
+</script>		<h2>The Blitz Machine</h2>	
+
 		<div class="events">
-		<h2>The Blitz Machine</h2>	
 	<script>
 	//var formData = {id:<?=$id?>,location:questionShowing,qtext:questionText,atext:answerText};
 
