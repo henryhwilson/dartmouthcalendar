@@ -245,7 +245,7 @@ def get_event2(event_url): # This method returns all the relevant information fo
     soup = BeautifulSoup(r.text)
 
     #get subject, from, and date
-    event_subject = soup.find(text="Subject:").findNext('a').contents[0].strip()      # finds subject of event
+    event_subject = soup.find(text="Subject:").findNext('a').contents[0].strip()           # finds subject of event
     event_from = soup.find(text="From:").findNext('p').contents[0].replace('<','')  # finds from of event
     date = soup.find(text="Date:").findNext('p').contents[0].replace('<','')         # finds date of blitz sent out
     

@@ -23,31 +23,16 @@ def faq():
 @app.route('/')
 @app.route('/index')
 def index():
+	return render_template('index.html')
+
+@app.route('/ajax/blitzMachine')
+def blitzMachine():
 	hourNow = datetime.now().hour
 	categories = []
 	categories.append('Greek')
 	categories.append('Social')
 	categories.append('Sports')
 	categories.append('Misc')
-	# nicknames = {
-	# 	'Delta Delta Delta':'TriDelt',
-	# 	'Kappa Kappa Gamma':'Kappa',
-	# 	'Alpha Delta':'AD',
-	# 	'Sigma Phi Epsilon':'SigEp',
-	# 	'Alpha Chi Alpha':'Alpha Chi',
-	# 	'AXA':'Alpha Chi', 
-	# 	'Beta Alpha Omega':'Beta',
-	# 	'Chi Heorot':'Heorot',
-	# 	'Collis Governing Board':'Collis',
-	# 	'Kappa Kappa Kappa':'Tri-Kap',
-	# 	'Kappa Delta':'KD',
-	# 	'Epsilon Kappa Theta': 'EKT',
-	# 	'Sigma Alpha Epsilon':'SAE',
-	# 	'Psi Upsilon': 'Psi U',
-	# 	'Zeta Psi': 'Zete',
-	# 	'Phi Delta Alpha': 'Phi Delt',
-	# 	'Alpha Xi Delta': 'AZD'
-	# 	}
 	realEvents = get_content2()
 
 	today_total_events = 0
@@ -66,6 +51,7 @@ def index():
 		elif (event['date_event'] == 'upcoming'):
 			upcoming_cat_freq[event['category']] += 1
 			upcoming_total_events += 1
+		event['blitz_date'] = event['blitz_date'].strftime('%A, %b %d %I:%M%p')
 		# if (not event['from'] in nicknames.keys()):
 		# 	nicknames[event['from']] = event['from'].strip()
 
@@ -73,7 +59,7 @@ def index():
 		isDay = True
 	else:
 		isDay = False
-	return render_template('index.html', is_day=isDay, categories=categories, today_cat_freq=today_cat_freq, 
+	return render_template('blitz-machine.html', is_day=isDay, categories=categories, today_cat_freq=today_cat_freq, 
 		tomorrow_cat_freq=tomorrow_cat_freq, upcoming_cat_freq=upcoming_cat_freq,
 		events=realEvents, today_total_events=today_total_events, tomorrow_total_events=tomorrow_total_events,
 		upcoming_total_events=upcoming_total_events)
@@ -83,6 +69,8 @@ def getEventHTML():
 	url = request.args.get("url")
 	sender = request.args.get("from")
 	date = request.args.get("date")
+	if (date == None):
+		date = ""
 	if url == None:
 		return None
 	url = ''+urllib.unquote_plus(url)
@@ -90,11 +78,13 @@ def getEventHTML():
 	if "<div id=\"divtagdefaultwrapper\"" in r.text:
 		indexOfDiv = r.text.index("<div id=\"divtagdefaultwrapper\"")
 		headers = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"><html><head><title>LISTSERV 16.0 - CAMPUS-EVENTS Archives</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"><style type=\"text/css\" style=\"display:none\"><!-- p { margin-top: 0px; margin-bottom: 0px; }--></style></head><body style=\"background-color: white\">"
-		headers = headers + "<h2 style=\"font-family: verdana\">Blitz from <em>" + sender + "</em></h2>"
+		headers = headers + "<h2 style=\"font-family: verdana; padding-bottom: 5px; margin-bottom: 0;\">Blitz from <em>" + sender + "</em></h2>"
+		headers = headers + "<h4 style=\"font-family: verdana; font-weight: normal; color: grey; padding-top: 0; margin-top: 0;\">Sent " + date + "</h4>"
 	elif "</div><meta" in r.text:
 		indexOfDiv = r.text.index("</div><meta")+len("</div>")
 		headers = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"><html><head><title>LISTSERV 16.0 - CAMPUS-EVENTS Archives</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"><style type=\"text/css\" style=\"display:none\"><!-- p { margin-top: 0px; margin-bottom: 0px; }--></style></head><body style=\"background-color: white\">"
-		headers = headers + "<h2 style=\"font-family: verdana\">Blitz from <em>" + sender + "</em></h2>"
+		headers = headers + "<h2 style=\"font-family: verdana; padding-bottom: 5px; margin-bottom: 0;\">Blitz from <em>" + sender + "</em></h2>"
+		headers = headers + "<h4 style=\"font-family: verdana; font-weight: normal; color: grey; padding-top: 0; margin-top: 0;\">Sent " + date + "</h4>"
 	else:
 		headers = "<div style=\"background-color: white; height: 100%\">"
 		indexOfDiv = 0
