@@ -283,7 +283,7 @@ def get_event2(event_url): # This method returns all the relevant information fo
             'phi delt',' azd '],
         ['collis','one wheelock','collis after dark','barhop'],
         ['football','soccer','hockey','baseball','basketball','tennis','volleyball','track & field','cross country','squash'],
-        ['acapella','decibelles','brovertones','cords','rockapellas','subtleties','dodecaphonics','dodecs','aires',
+        ['acapella','dog day','decibelles','brovertones','cords','rockapellas','subtleties','dodecaphonics','dodecs','aires',
             'dartmouth symphony orchestra','soul scribes','casual thursday','rude mechanicals'],
     ]
 
