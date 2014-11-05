@@ -32,15 +32,16 @@ def blitzMachine():
 	categories.append('Greek')
 	categories.append('Social')
 	categories.append('Sports')
+	categories.append('Performances')
 	categories.append('Misc')
 	realEvents = get_content2()
 
 	today_total_events = 0
-	today_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Misc':0}
+	today_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Performances':0,'Misc':0}
 	tomorrow_total_events = 0
-	tomorrow_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Misc':0}
+	tomorrow_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Performances':0,'Misc':0}
 	upcoming_total_events = 0
-	upcoming_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Misc':0}
+	upcoming_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Performances':0,'Misc':0}
 	for event in realEvents:
 		if (event['date_event'] == 'today'):
 			today_cat_freq[event['category']] += 1
@@ -71,6 +72,8 @@ def getEventHTML():
 	date = request.args.get("date")
 	if (date == None):
 		date = ""
+	else:
+		date = "Sent " + date
 	if url == None:
 		return None
 	url = ''+urllib.unquote_plus(url)
@@ -79,12 +82,12 @@ def getEventHTML():
 		indexOfDiv = r.text.index("<div id=\"divtagdefaultwrapper\"")
 		headers = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"><html><head><title>LISTSERV 16.0 - CAMPUS-EVENTS Archives</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"><style type=\"text/css\" style=\"display:none\"><!-- p { margin-top: 0px; margin-bottom: 0px; }--></style></head><body style=\"background-color: white\">"
 		headers = headers + "<h2 style=\"font-family: verdana; padding-bottom: 5px; margin-bottom: 0;\">Blitz from <em>" + sender + "</em></h2>"
-		headers = headers + "<h4 style=\"font-family: verdana; font-weight: normal; color: grey; padding-top: 0; margin-top: 0;\">Sent " + date + "</h4>"
+		headers = headers + "<h4 style=\"font-family: verdana; font-weight: normal; color: grey; padding-top: 0; margin-top: 0;\">" + date + "</h4>"
 	elif "</div><meta" in r.text:
 		indexOfDiv = r.text.index("</div><meta")+len("</div>")
 		headers = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"><html><head><title>LISTSERV 16.0 - CAMPUS-EVENTS Archives</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"><style type=\"text/css\" style=\"display:none\"><!-- p { margin-top: 0px; margin-bottom: 0px; }--></style></head><body style=\"background-color: white\">"
 		headers = headers + "<h2 style=\"font-family: verdana; padding-bottom: 5px; margin-bottom: 0;\">Blitz from <em>" + sender + "</em></h2>"
-		headers = headers + "<h4 style=\"font-family: verdana; font-weight: normal; color: grey; padding-top: 0; margin-top: 0;\">Sent " + date + "</h4>"
+		headers = headers + "<h4 style=\"font-family: verdana; font-weight: normal; color: grey; padding-top: 0; margin-top: 0;\">" + date + "</h4>"
 	else:
 		headers = "<div style=\"background-color: white; height: 100%\">"
 		indexOfDiv = 0

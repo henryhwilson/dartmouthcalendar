@@ -265,8 +265,29 @@ def get_event2(event_url): # This method returns all the relevant information fo
         'psi upsilon': 'Psi U',
         'zeta psi': 'Zete',
         'phi Delta alpha': 'Phi Delt',
-        'alpha xi delta': 'AZD'
+        'alpha xi delta': 'AZD',
+        'dartmouth outing club':'DOC',
+        '"bar.hop"':'BarHop'
         }
+
+    categories_names = [
+        'Greek',
+        'Social',
+        'Sports',
+        'Performances',
+        'Misc'
+    ]
+
+    categories = [
+        ['tridelt','kappa',' ad ','sigep','alpha chi',' beta ','heorot','tri-kap','trikap',' kd ',' ekt ',' sae ',' psi u ',' psiu ',' zete ',
+            'phi delt',' azd '],
+        ['collis','one wheelock','collis after dark','barhop'],
+        ['football','soccer','hockey','baseball','basketball','tennis','volleyball','track & field','cross country','squash'],
+        ['acapella','decibelles','brovertones','cords','rockapellas','subtleties','dodecaphonics','dodecs','aires',
+            'dartmouth symphony orchestra','soul scribes','casual thursday','rude mechanicals'],
+    ]
+
+    print categories
 
     event_from = event_from.strip()
     if event_from.lower() in nicknames.keys():
@@ -316,25 +337,42 @@ def get_event2(event_url): # This method returns all the relevant information fo
     messageDay = loc_dt.date().day
     messageMonth = loc_dt.date().month
     daysInMessageMonth = calendar.monthrange(loc_dt.date().year, messageMonth)[1]
-    thisEvent = None
+    thisEvent = {'from':event_from,'subject':event_subject,'blitz_date':loc_dt,'category':'Misc','time_event':'7PM','date_event':'', 'html':htmlurl}
 
+    if event_from.lower() in categories[0] or event_subject.lower() in categories[0]:
+            thisEvent['category'] = categories_names[0]
+    elif event_from.lower() in categories[1] or event_subject.lower() in categories[1]:
+            thisEvent['category'] = categories_names[1]
+    elif event_from.lower() in categories[2] or event_subject.lower() in categories[2]:
+            thisEvent['category'] = categories_names[2]
+    elif event_from.lower() in categories[3] or event_subject.lower() in categories[3]:
+            thisEvent['category'] = categories_names[3]
     # Loop through all the words.
     for word in words:
         # If the word is a keyword.
+        if (thisEvent['category'] == 'Misc'):
+            if word.lower() in categories[0]:
+                thisEvent['category'] = categories_names[0]
+            elif word.lower() in categories[1]:
+                thisEvent['category'] = categories_names[1]
+            elif word.lower() in categories[2]:
+                thisEvent['category'] = categories_names[2]
+            elif word.lower() in categories[3]:
+                thisEvent['category'] = categories_names[3]
+
         if word.lower() in keywords.keys():
+            print "Got here"
             classifier = keywords.get(word.lower())
             if classifier == "today":
                 # check if the event message was sent today
                 if messageDay == todayDay:
-                    thisEvent = {'from':event_from,'subject':event_subject, 'blitz_date':loc_dt,
-                    'category':'Greek','time_event':'7PM','date_event':'today', 'html':htmlurl} 
+                    thisEvent['date_event'] = 'today'
             elif classifier == "tomorrow":
                 # Check if the event message was sent today or yesterday.
                 if messageDay == todayDay:
-                    thisEvent = {'from':event_from,'subject':event_subject, 'blitz_date':loc_dt,'category':'Sports','time_event':'8PM','date_event':'tomorrow', 'html':htmlurl} 
+                    thisEvent['date_event'] = 'tomorrow'
                 elif (messageDay == (todayDay - 1)) or (messageDay + 1 == todayDay + daysInMessageMonth):
-                    thisEvent = {'from':event_from,'subject':event_subject, 'blitz_date':loc_dt,'category':'Social','time_event':'9PM','date_event':'today', 'html':htmlurl}
-            
+                    thisEvent['date_event'] = 'today'
             # If the word implies a day of the week.
             elif isint(classifier) and (int("0") <= int(classifier) <= int("6")):
                 # Need to deal with month overlaps
@@ -349,19 +387,18 @@ def get_event2(event_url): # This method returns all the relevant information fo
                     eventDay = eventDay - daysInMessageMonth
 
                 if eventDay == todayDay:
-                    thisEvent = {'from':event_from,'subject':event_subject, 'blitz_date':loc_dt,
-                    'category':'Greek','time_event':'7PM','date_event':'today', 'html':htmlurl}
+                    thisEvent['date_event'] = 'today'
                 elif eventDay == (todayDay + 1):
-                    thisEvent = {'from':event_from,'subject':event_subject, 'blitz_date':loc_dt,
-                    'category':'Social','time_event':'9PM','date_event':'tomorrow', 'html':htmlurl}
+                    thisEvent['date_event'] = 'tomorrow'
                 elif eventDay > todayDay:
-                    thisEvent = {'from':event_from,'subject':event_subject, 'blitz_date':loc_dt,
-                    'category':'Sports','time_event':'8PM','date_event':'upcoming', 'html':htmlurl}
+                    thisEvent['date_event'] = 'upcoming'
 
-            # Return the event if it contained an event date.
-            if thisEvent:
+            if (thisEvent['date_event'] != ''):
+                print 'Found date. Subject: ' + thisEvent['subject'] + ' Category: ' + thisEvent['category']
                 return thisEvent
 
-
+    # Return the event if it contained an event date.
+    # if thisEvent['date_event'] != '':
     #return all
+    print thisEvent['category']
     return thisEvent
