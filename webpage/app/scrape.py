@@ -4,6 +4,7 @@ import datetime
 import time
 import pytz
 import calendar
+import re
 from pytz import timezone
 from datetime import datetime
 from bs4 import BeautifulSoup
@@ -14,6 +15,10 @@ from bs4 import BeautifulSoup
 # Scrape time and location.
 # Make scraping faster and more efficient
 # incorporate database and get rid of only getting 10 events.
+
+# Finding time but not printing correctly
+# only showing 3 events, not 6
+# is it only returning an event if it is in the future?
 
 # Helper function that checks if a string can be converted to an int.
 def isint(s):
@@ -292,7 +297,7 @@ def get_event2(event_url): # This method returns all the relevant information fo
             'dartmouth symphony orchestra','soul scribes','casual thursday','rude mechanicals'],
     ]
 
-    print categories
+    #print categories
 
     event_from = event_from.strip()
     if event_from.lower() in nicknames.keys():
@@ -342,7 +347,7 @@ def get_event2(event_url): # This method returns all the relevant information fo
     messageDay = loc_dt.date().day
     messageMonth = loc_dt.date().month
     daysInMessageMonth = calendar.monthrange(loc_dt.date().year, messageMonth)[1]
-    thisEvent = {'from':event_from,'subject':event_subject,'blitz_date':loc_dt,'category':'Misc','time_event':'7PM','date_event':'', 'html':htmlurl}
+    thisEvent = {'from':event_from,'subject':event_subject,'blitz_date':loc_dt,'category':'Misc','time_event':'Unknown','date_event':'', 'html':htmlurl}
 
     if event_from.lower() in categories[0] or event_subject.lower() in categories[0]:
             thisEvent['category'] = categories_names[0]
@@ -354,6 +359,12 @@ def get_event2(event_url): # This method returns all the relevant information fo
             thisEvent['category'] = categories_names[3]
     # Loop through all the words.
     for word in words:
+        #print word
+        if thisEvent['time_event'] == "Unknown":
+            time = time_match(word)
+            if time:
+                thisEvent['time_event'] = time
+
         # If the word is a keyword.
         if (thisEvent['category'] == 'Misc'):
             if word.lower() in categories[0]:
@@ -365,8 +376,8 @@ def get_event2(event_url): # This method returns all the relevant information fo
             elif word.lower() in categories[3]:
                 thisEvent['category'] = categories_names[3]
 
-        if word.lower() in keywords.keys():
-            print "Got here"
+        if thisEvent['date_event'] == '' and word.lower() in keywords.keys():
+            #print "Got here"
             classifier = keywords.get(word.lower())
             if classifier == "today":
                 # check if the event message was sent today
@@ -398,12 +409,24 @@ def get_event2(event_url): # This method returns all the relevant information fo
                 elif eventDay > todayDay:
                     thisEvent['date_event'] = 'upcoming'
 
-            if (thisEvent['date_event'] != ''):
+            if (thisEvent['date_event'] != '' and thisEvent['time_event'] != 'Unknown'):
                 print 'Found date. Subject: ' + thisEvent['subject'] + ' Category: ' + thisEvent['category']
                 return thisEvent
 
     # Return the event if it contained an event date.
-    # if thisEvent['date_event'] != '':
-    #return all
-    print thisEvent['category']
-    return thisEvent
+    if thisEvent['date_event'] != '':
+        return thisEvent
+    #print thisEvent['category']
+    return None
+
+# Looks for a regex match to a time pattern.
+def time_match(word):
+    word = word.lower().strip()
+    match = re.search(r'(^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$)|(^[1-9]$)|(^1[0-2]$)|(([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9][ap]m)|([1-9][ap]m)|(1[0-2][ap]m)', word)
+    if match:
+        time = match.group()
+        if re.search(r'((\:[0-9][0-9])|([ap]m))', time) == None:
+            time = time + ":00pm"
+        return time
+
+    return match
