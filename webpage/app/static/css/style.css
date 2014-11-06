@@ -185,6 +185,12 @@ body {
 	font-size: 1.5em;
 }
 
+.error {
+	font-family: verdana;
+	font-size: 1.3em;
+	color: red;
+}
+
 #loading-left-text {
 	font-family: verdana;
 	font-size: 1.2em;
