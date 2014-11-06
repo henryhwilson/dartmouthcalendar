@@ -6,5 +6,6 @@ create table if not exists events (
   category text not null, 
   time_event text not null,
   date_event text not null,
-  html text not null
+  html text not null,
+  blitz_url text not null
 );
