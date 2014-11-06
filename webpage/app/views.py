@@ -1,12 +1,29 @@
-from flask import render_template, abort, request
+from flask import render_template, abort, request, session, g, redirect, url_for, abort, flash
 from calendar import Calendar
 from datetime import date
 from app import app
 from scrape import get_content, get_event, get_event2, get_content2
 from datetime import datetime
 from bs4 import BeautifulSoup
+from contextlib import closing
+from sqlite3 import dbapi2 as sqlite3
 import requests
 import urllib
+
+
+@app.route('/database')
+def show_entries():
+	realEvents = get_content2()
+	for event in realEvents:
+		cur = g.db.execute('select id from events where html = ?',(event['html'],))
+		data = cur.fetchone()
+		if data is None:
+			g.db.execute('insert into events (event_from, subject, blitz_date, category, time_event, date_event, html) values (?,?,?,?,?,?,?)',[event['from'],event['subject'],event['blitz_date'],event['category'],event['time_event'],event['date_event'],event['html']])
+			g.db.commit()
+	cur = g.db.execute('select event_from, subject from events order by id desc')
+	events = [dict(sender=row[0], subject=row[1]) for row in cur.fetchall()]
+	string = str(events)
+	return string
 
 @app.route('/add_event')
 def add_event():
