@@ -195,9 +195,14 @@ def get_content2(): #returns a list of recent blitzes
                         if '/scripts/wa.exe?A2=' in event.get('href'):
                             newEvent = get_event2(urllib.quote_plus(event.get('href')))
                             if newEvent:
-                                realEvents.append(newEvent)
+                                foundMatch = False
+                                for realEvent in realEvents:
+                                    if newEvent['from'] == realEvent['from'] and newEvent['subject'] == realEvent['subject'] and newEvent['date_event'] == realEvent['date_event'] and newEvent['time_event'] == realEvent['time_event']:
+                                        foundMatch = True
+                                if not foundMatch:
+                                    realEvents.append(newEvent)
                             #TESTING - only get 10 events
-                            if len(realEvents) >= 6:
+                            if len(realEvents) >= 10:
                                 return realEvents
                 iterator = iterator + 1
 

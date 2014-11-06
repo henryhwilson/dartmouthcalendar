@@ -89,13 +89,13 @@ def getEventHTML():
 		headers = headers + "<h2 style=\"font-family: verdana; padding-bottom: 5px; margin-bottom: 0;\">Blitz from <em>" + sender + "</em></h2>"
 		headers = headers + "<h4 style=\"font-family: verdana; font-weight: normal; color: grey; padding-top: 0; margin-top: 0;\">" + date + "</h4>"
 	else:
-		headers = "<div style=\"background-color: white; height: 100%\">"
+		headers = "<style>body { background-color: white; }</style>"
 		indexOfDiv = 0
 	output = headers + r.text[indexOfDiv:]
 	while "b-print.png\"" in output:
 		indexOfSrc = output.index("b-print.png")+11
 		output = output[:indexOfSrc] + '' + output[indexOfSrc+1:]
-	while "src=\"" in output:
+	while "src=\"/scripts" in output or "src=\"/archives" in output:
 		indexOfSrc = output.index("src=\"")+4
 		output = output[:indexOfSrc] + 'https://listserv.dartmouth.edu' + output[indexOfSrc+1:]
 	return output
