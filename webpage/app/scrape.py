@@ -5,6 +5,7 @@ import time
 import pytz
 import calendar
 import re
+import string
 from pytz import timezone
 from datetime import datetime
 from bs4 import BeautifulSoup
@@ -239,7 +240,7 @@ def get_content2(): #returns a list of recent blitzes
                             if newEvent:
                                 realEvents.append(newEvent)
                             # TESTING - only get 10 events
-                            if len(realEvents) >= 6:
+                            if len(realEvents) >= 10:
                                 return realEvents
                 iterator = iterator + 1
     return realEvents
@@ -293,7 +294,7 @@ def get_event2(event_url): # This method returns all the relevant information fo
 
     categories = [
         ['tridelt','kappa',' ad ','sigep','alpha chi',' beta ','heorot','tri-kap','trikap',' kd ',' ekt ',' sae ',' psi u ',' psiu ',' zete ',
-            'phi delt',' azd '],
+            'phi delt',' azd ', 'alpha theta'],
         ['collis','one wheelock','collis after dark','barhop'],
         ['football','soccer','hockey','baseball','basketball','tennis','volleyball','track & field','cross country','squash'],
         ['acapella','dog day','decibelles','brovertones','cords','rockapellas','subtleties','dodecaphonics','dodecs','aires',
@@ -362,21 +363,23 @@ def get_event2(event_url): # This method returns all the relevant information fo
             thisEvent['category'] = categories_names[3]
     # Loop through all the words.
     for word in words:
+        word = word.lower().strip().strip(string.punctuation)
         #print word
         if thisEvent['time_event'] == '':
+            time = None
             time = time_match(word)
             if time:
                 thisEvent['time_event'] = time
 
         # If the word is a keyword.
         if (thisEvent['category'] == 'Misc'):
-            if word.lower() in categories[0]:
+            if word in categories[0]:
                 thisEvent['category'] = categories_names[0]
-            elif word.lower() in categories[1]:
+            elif word in categories[1]:
                 thisEvent['category'] = categories_names[1]
-            elif word.lower() in categories[2]:
+            elif word in categories[2]:
                 thisEvent['category'] = categories_names[2]
-            elif word.lower() in categories[3]:
+            elif word in categories[3]:
                 thisEvent['category'] = categories_names[3]
 
         if thisEvent['date_event'] == '' and word.lower() in keywords.keys():
@@ -424,8 +427,8 @@ def get_event2(event_url): # This method returns all the relevant information fo
 
 # Looks for a regex match to a time pattern.
 def time_match(word):
-    word = word.lower().strip()
-
+    if word == "noon":
+        return "Noon"
     # Search for times.
     match = re.search(r'(^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$)|(^[1-9]$)|(^1[0-2]$)|(([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9][ap]m)|([1-9][ap]m)|(1[0-2][ap]m)', word)
     if match:
