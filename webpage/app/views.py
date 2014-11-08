@@ -33,15 +33,16 @@ def blitzMachine():
 	categories.append('Social')
 	categories.append('Sports')
 	categories.append('Performances')
+	categories.append('Talks and Discussions')
 	categories.append('Misc')
 	realEvents = get_content2()
 
 	today_total_events = 0
-	today_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Performances':0,'Misc':0}
+	today_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Performances':0, 'Talks and Discussions':0, 'Misc':0}
 	tomorrow_total_events = 0
-	tomorrow_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Performances':0,'Misc':0}
+	tomorrow_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Performances':0,'Talks and Discussions':0,'Misc':0}
 	upcoming_total_events = 0
-	upcoming_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Performances':0,'Misc':0}
+	upcoming_cat_freq = {'Greek':0,'Social':0,'Sports':0,'Performances':0,'Talks and Discussions':0, 'Misc':0}
 	for event in realEvents:
 		if (event['date_event'] == 'today'):
 			today_cat_freq[event['category']] += 1

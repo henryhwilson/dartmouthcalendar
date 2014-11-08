@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 
 
 # Day keywords
-DATEKEYWORDS = {'today':"today",
+DATE_KEYWORDS = {'today':"today",
     "tonight":"today",
     "tomorrow":"tomorrow",
     "monday":"0",
@@ -24,7 +24,7 @@ DATEKEYWORDS = {'today':"today",
     "sunday":"6"
     }
 
-nicknames = {
+GROUP_NICKNAMES = {
     'delta delta delta':'TriDelt',
     'kappa kappa gamma':'Kappa',
     'alpha delta':'AD',
@@ -42,24 +42,35 @@ nicknames = {
     'phi Delta alpha': 'Phi Delt',
     'alpha xi delta': 'AZD',
     'dartmouth outing club':'DOC',
-    '"bar.hop"':'BarHop'
+    'bar.hop':'BarHop',
+    'rockefeller student programs': 'Rocky'
     }
 
-categories_names = [
+CATEGORIES_NAMES = [
     'Greek',
     'Social',
     'Sports',
     'Performances',
+    'Talks and Discussions',
     'Misc'
 ]
 
-categories = [
+CATEGORIES = [
+    #Greek
     ['tridelt','kappa',' ad ','sigep','alpha chi',' beta ','heorot','tri-kap','trikap',' kd ',' ekt ',' sae ',' psi u ',' psiu ',' zete ',
         'phi delt',' azd ', 'alpha theta'],
-    ['collis','one wheelock','collis after dark','barhop'],
+    #Social
+    ['collis','one wheelock','collis after dark','barhop', 'creative gaming club'],
+
+    #Sports
     ['football','soccer','hockey','baseball','basketball','tennis','volleyball','track & field','cross country','squash'],
+
+    # Performances
     ['acapella','dog day','decibelles','brovertones','cords','rockapellas','subtleties','dodecaphonics','dodecs','aires',
-        'dartmouth symphony orchestra','soul scribes','casual thursday','rude mechanicals'],
+        'dartmouth symphony orchestra','soul scribes','casual thursday','rude mechanicals', 'street soul'],
+
+    # Talks and Discussions
+    ['rocky', 'dartmouth physics society']
 ]
 # TO DO
 # [Errno 32] Broken pipe - error
@@ -71,7 +82,6 @@ categories = [
 # Change 6pm to 6:00pm
 
 # Finding time but not printing correctly
-# only showing 3 events, not 6
 # is it only returning an event if it is in the future?
 
 
@@ -269,8 +279,8 @@ def get_event2(event_url): # This method returns all the relevant information fo
     date = soup.find(text="Date:").findNext('p').contents[0].replace('<','')         # finds date of blitz sent out
 
     event_from = event_from.strip()
-    if event_from.lower() in nicknames.keys():
-        event_from = nicknames.get(event_from.lower())
+    if event_from.lower() in GROUP_NICKNAMES.keys():
+        event_from = GROUP_NICKNAMES.get(event_from.lower())
     #formats the date (NOTE: there's a bug where some events don't have +0000 but -4000, which throws an error)
     try:
     	utc_dt = datetime.strptime(date.replace(' +0000',''),'%a, %d %b %Y %H:%M:%S').replace(tzinfo=pytz.utc)
@@ -301,74 +311,36 @@ def get_event2(event_url): # This method returns all the relevant information fo
     words = txt.split()
 
     # Information about today and about the message.
-    todayDay = datetime.now().date().day
+    nowDay = datetime.now().date().day
     messageDay = loc_dt.date().day
     messageMonth = loc_dt.date().month
     daysInMessageMonth = calendar.monthrange(loc_dt.date().year, messageMonth)[1]
     thisEvent = {'from':event_from,'subject':event_subject,'blitz_date':loc_dt,'category':'Misc','time_event':'','date_event':'', 'html':htmlurl}
 
-    if event_from.lower() in categories[0] or event_subject.lower() in categories[0]:
-            thisEvent['category'] = categories_names[0]
-    elif event_from.lower() in categories[1] or event_subject.lower() in categories[1]:
-            thisEvent['category'] = categories_names[1]
-    elif event_from.lower() in categories[2] or event_subject.lower() in categories[2]:
-            thisEvent['category'] = categories_names[2]
-    elif event_from.lower() in categories[3] or event_subject.lower() in categories[3]:
-            thisEvent['category'] = categories_names[3]
-    # Loop through all the words.
+    findCategory(thisEvent, event_from.lower())
+
+    # Loop through all the words, looking for event-related keywords.
     for word in words:
+        # Remove all punctuation, spaces, and make lower case.
         word = word.lower().strip().strip(string.punctuation)
-        #print word
+
+        # Check if the word is a time, if we have not found time already.
         if thisEvent['time_event'] == '':
             time = None
             time = time_match(word)
             if time:
                 thisEvent['time_event'] = time
 
-        # If the word is a keyword.
+        # If the event does not have a category, check if the word is a keyword.
         if (thisEvent['category'] == 'Misc'):
-            if word in categories[0]:
-                thisEvent['category'] = categories_names[0]
-            elif word in categories[1]:
-                thisEvent['category'] = categories_names[1]
-            elif word in categories[2]:
-                thisEvent['category'] = categories_names[2]
-            elif word in categories[3]:
-                thisEvent['category'] = categories_names[3]
+            findCategory(thisEvent, word)
 
-        if thisEvent['date_event'] == '' and word.lower() in DATEKEYWORDS.keys():
-            #print "Got here"
-            classifier = DATEKEYWORDS.get(word.lower())
-            if classifier == "today":
-                # check if the event message was sent today
-                if messageDay == todayDay:
-                    thisEvent['date_event'] = 'today'
-            elif classifier == "tomorrow":
-                # Check if the event message was sent today or yesterday.
-                if messageDay == todayDay:
-                    thisEvent['date_event'] = 'tomorrow'
-                elif (messageDay == (todayDay - 1)) or (messageDay + 1 == todayDay + daysInMessageMonth):
-                    thisEvent['date_event'] = 'today'
-            # If the word implies a day of the week.
-            elif isint(classifier) and (int("0") <= int(classifier) <= int("6")):
-                # Need to deal with month overlaps
-                eventDayofWeek = int(classifier)
+        # If we do not know the event date and if the word is an date keyword.
+        if thisEvent['date_event'] == '' and word in DATE_KEYWORDS.keys():
+            classifier = DATE_KEYWORDS.get(word) # What the word signifies.
+            findEventDate(thisEvent, classifier, messageDay, messageMonth, nowDay, daysInMessageMonth, loc_dt)
 
-                # Find which day the event is on based on the word and the message date.
-                daysFromMessage = (eventDayofWeek - loc_dt.date().weekday()) % 7
-                eventDay = messageDay + daysFromMessage
-
-                # If the message is from last month.
-                if datetime.now().date().month > messageMonth:
-                    eventDay = eventDay - daysInMessageMonth
-
-                if eventDay == todayDay:
-                    thisEvent['date_event'] = 'today'
-                elif eventDay == (todayDay + 1):
-                    thisEvent['date_event'] = 'tomorrow'
-                elif eventDay > todayDay:
-                    thisEvent['date_event'] = 'upcoming'
-
+            # If we have all the event information that we need.
             if (thisEvent['date_event'] != '' and thisEvent['time_event'] != ''):
                 #print 'Found date. Subject: ' + thisEvent['subject'] + ' Category: ' + thisEvent['category']
                 return thisEvent
@@ -376,9 +348,73 @@ def get_event2(event_url): # This method returns all the relevant information fo
     # Return the event if it contained an event date.
     if thisEvent['date_event'] != '':
         return thisEvent
-    #print thisEvent['category']
+
     return None
 
+# Checks what day the classifier implies. Does so by comparing the message date and the
+# current date, with regard to the classifier.
+# @event - the event that we are looking for a date for.
+# @classifier - the date-implying classifier.
+# @messageDay - the day of the month of the message.
+# @nowDay - the day of the month of right now.
+# @daysInMessageMonth - the number of days in the month the message was sent in.
+# @loc_dt - datetime object for the message
+def findEventDate(event, classifier, messageDay, messageMonth, nowDay, daysInMessageMonth, loc_dt):
+    # If the word implies today.
+    if classifier == "today":
+        # check if the event message was sent today
+        if messageDay == nowDay:
+            event['date_event'] = 'today'
+
+    # If the word implies tomorrow.
+    elif classifier == "tomorrow":
+        # Check if the event message was sent today or yesterday.
+        if messageDay == nowDay:
+            event['date_event'] = 'tomorrow'
+        elif (messageDay == (nowDay - 1)) or (messageDay + 1 == nowDay + daysInMessageMonth):
+            event['date_event'] = 'today'
+
+    # If the word implies a day of the week.
+    elif isint(classifier) and (int("0") <= int(classifier) <= int("6")):
+        # Need to deal with month overlaps
+        eventDayofWeek = int(classifier)
+
+        # Find which day the event is on based on the word and the message date.
+        daysFromMessage = (eventDayofWeek - loc_dt.date().weekday()) % 7
+        eventDay = messageDay + daysFromMessage
+
+        # If the message is from last month.
+        if datetime.now().date().month > messageMonth:
+            eventDay = eventDay - daysInMessageMonth
+
+        # If the eventDay is in the future.
+        if eventDay == nowDay:
+            event['date_event'] = 'today'
+        elif eventDay == (nowDay + 1):
+            event['date_event'] = 'tomorrow'
+        elif eventDay > nowDay:
+            event['date_event'] = 'upcoming'
+
+# Checks if a possibleKeyword signifies a category for the event.
+# @event - the event object that we are dealing with.
+# @possibleKeyword - a word or phrase that might signify a keyword.
+# @return - nothing. Changes the event object directly.
+def findCategory(event, possibleKeyword):
+    # All categories are in categories_names, and misc is only in categories_names.
+    if (len(CATEGORIES) +  1)!= len(CATEGORIES_NAMES):
+        raise Exception("CATEGORIES should have one less entry than CATEGORIES_NAMES")
+
+    # Check all categories.
+    for i in range(len(CATEGORIES)):
+        if possibleKeyword in CATEGORIES[i]:
+            event['category'] = CATEGORIES_NAMES[i]
+            return
+
+# Goes through a listserv page of the events for that week. Goes through each event,
+# and looks for event information. Keeps track of all events that are in the future.
+# @url - the url for the listserv page for the events of that week.
+# @events - the list of event objects.
+# return - nothing. Changes the events list directly.
 def getEventsFromWeek(url, events):
     r = requests.get(url) # stores url response in var "r"
     soup = BeautifulSoup(r.text) # stores url response in a BeautifulSoup object for later parsing
@@ -406,8 +442,10 @@ def getEventsFromWeek(url, events):
                             if len(events) >= 10:
                                 return
                 iterator = iterator + 1
-                
+
 # Looks for a regex match to a time pattern.
+# @word - the word that might signify a time.
+# @return - the part of the word that matches with a time, or None.
 def time_match(word):
     if word == "noon":
         return "Noon"
