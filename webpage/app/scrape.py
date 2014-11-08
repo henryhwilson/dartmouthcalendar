@@ -10,6 +10,57 @@ from pytz import timezone
 from datetime import datetime
 from bs4 import BeautifulSoup
 
+
+# Day keywords
+DATEKEYWORDS = {'today':"today",
+    "tonight":"today",
+    "tomorrow":"tomorrow",
+    "monday":"0",
+    "tuesday": "1",
+    "wednesday":"2",
+    "thursday":"3",
+    "friday": "4",
+    "saturday": "5",
+    "sunday":"6"
+    }
+
+nicknames = {
+    'delta delta delta':'TriDelt',
+    'kappa kappa gamma':'Kappa',
+    'alpha delta':'AD',
+    'sigma phi epsilon':'SigEp',
+    'alpha chi alpha':'Alpha Chi',
+    'beta alpha omega':'Beta',
+    'chi heorot':'Heorot',
+    'collis governing board':'Collis',
+    'kappa kappa kappa':'Tri-Kap',
+    'kappa delta':'KD',
+    'epsilon kappa theta': 'EKT',
+    'sigma alpha epsilon':'SAE',
+    'psi upsilon': 'Psi U',
+    'zeta psi': 'Zete',
+    'phi Delta alpha': 'Phi Delt',
+    'alpha xi delta': 'AZD',
+    'dartmouth outing club':'DOC',
+    '"bar.hop"':'BarHop'
+    }
+
+categories_names = [
+    'Greek',
+    'Social',
+    'Sports',
+    'Performances',
+    'Misc'
+]
+
+categories = [
+    ['tridelt','kappa',' ad ','sigep','alpha chi',' beta ','heorot','tri-kap','trikap',' kd ',' ekt ',' sae ',' psi u ',' psiu ',' zete ',
+        'phi delt',' azd ', 'alpha theta'],
+    ['collis','one wheelock','collis after dark','barhop'],
+    ['football','soccer','hockey','baseball','basketball','tennis','volleyball','track & field','cross country','squash'],
+    ['acapella','dog day','decibelles','brovertones','cords','rockapellas','subtleties','dodecaphonics','dodecs','aires',
+        'dartmouth symphony orchestra','soul scribes','casual thursday','rude mechanicals'],
+]
 # TO DO
 # [Errno 32] Broken pipe - error
 # -4000 on time.
@@ -186,64 +237,18 @@ def get_content2(): #returns a list of recent blitzes
 
     # Finds the correct link for the list of this week's events, 
     # then gets the basic info for all of those events
-
-    r = requests.get(listserv_url) # stores url response in var "r"
-    soup = BeautifulSoup(r.text) # stores url response in a BeautifulSoup object for later parsing
-    realEvents = []
-    iterator = 0
-    for link in soup.find_all('a'): # go through every link from the url
-        if iterator > 0: # we only want to go through this loop once, iterator makes sure of that
-            break
-        href = link.get('href') # href now holds the href of the link
-        if href: # if href isn't None
-            if  '/scripts/wa.exe?A1=' in href: # if href contains this string, it's what we're looking for
-                r = requests.get('https://listserv.dartmouth.edu'+href) # makes a new request from this link
-                soup2 = BeautifulSoup(r.text) # puts it into beautifulsoup format
-                for event in soup2.find_all('a'): # for all of the links on this page
-                    if event.get('href'):
-                        if '/scripts/wa.exe?A2=' in event.get('href'):
-                            newEvent = get_event2(urllib.quote_plus(event.get('href')))
-                            if newEvent:
-                                foundMatch = False
-                                for realEvent in realEvents:
-                                    if newEvent['from'] == realEvent['from'] and newEvent['subject'] == realEvent['subject'] and newEvent['date_event'] == realEvent['date_event'] and newEvent['time_event'] == realEvent['time_event']:
-                                        foundMatch = True
-                                if not foundMatch:
-                                    realEvents.append(newEvent)
-                            #TESTING - only get 10 events
-                            if len(realEvents) >= 10:
-                                return realEvents
-                iterator = iterator + 1
+    events = []
+    getEventsFromWeek(listserv_url, events)
+    if len(events) > 10:
+        return events
 
     # Scrape for last week
-    # NOTE: I will move this soup/link/event/iterator stuff into a separate function,
-    # once I know it is okay to do that.
-    # h: yeah that'd be good! also might want to get the "from" field (who the event was sent from) as well since that's part of it
-    listserv_url2 = 'https://listserv.dartmouth.edu/scripts/wa.exe?A1=ind' + str(last_year) + str(padded_last_month) + letter_for_last_week + '&L=CAMPUS-EVENTS&O=D&H=0&D=1&T=1'
+    listserv_url_lastweek = 'https://listserv.dartmouth.edu/scripts/wa.exe?A1=ind' + str(last_year) + str(padded_last_month) + letter_for_last_week + '&L=CAMPUS-EVENTS&O=D&H=0&D=1&T=1'
+    getEventsFromWeek(listserv_url_lastweek, events)
 
-    #same comments as above for this loop
-    r = requests.get(listserv_url2)
-    soup3 = BeautifulSoup(r.text)
-    iterator = 0
-    for link in soup3.find_all('a'):
-        if iterator > 0:
-            break
-        href = link.get('href')
-        if href:
-            if  '/scripts/wa.exe?A1=' in href:
-                r = requests.get('https://listserv.dartmouth.edu'+href)
-                soup4 = BeautifulSoup(r.text)
-                for event in soup4.find_all('a'):
-                    if event.get('href'):
-                        if '/scripts/wa.exe?A2=' in event.get('href'):
-                            newEvent = get_event2(urllib.quote_plus(event.get('href')))
-                            if newEvent:
-                                realEvents.append(newEvent)
-                            # TESTING - only get 10 events
-                            if len(realEvents) >= 10:
-                                return realEvents
-                iterator = iterator + 1
-    return realEvents
+    return events
+
+
 
 def get_event2(event_url): # This method returns all the relevant information for a specific event URL given
     #initialize vars
@@ -262,46 +267,6 @@ def get_event2(event_url): # This method returns all the relevant information fo
     event_subject = soup.find(text="Subject:").findNext('a').contents[0].strip()           # finds subject of event
     event_from = soup.find(text="From:").findNext('p').contents[0].replace('<','')  # finds from of event
     date = soup.find(text="Date:").findNext('p').contents[0].replace('<','')         # finds date of blitz sent out
-    
-    nicknames = {
-        'delta delta delta':'TriDelt',
-        'kappa kappa gamma':'Kappa',
-        'alpha delta':'AD',
-        'sigma phi epsilon':'SigEp',
-        'alpha chi alpha':'Alpha Chi',
-        'beta alpha omega':'Beta',
-        'chi heorot':'Heorot',
-        'collis governing board':'Collis',
-        'kappa kappa kappa':'Tri-Kap',
-        'kappa delta':'KD',
-        'epsilon kappa theta': 'EKT',
-        'sigma alpha epsilon':'SAE',
-        'psi upsilon': 'Psi U',
-        'zeta psi': 'Zete',
-        'phi Delta alpha': 'Phi Delt',
-        'alpha xi delta': 'AZD',
-        'dartmouth outing club':'DOC',
-        '"bar.hop"':'BarHop'
-        }
-
-    categories_names = [
-        'Greek',
-        'Social',
-        'Sports',
-        'Performances',
-        'Misc'
-    ]
-
-    categories = [
-        ['tridelt','kappa',' ad ','sigep','alpha chi',' beta ','heorot','tri-kap','trikap',' kd ',' ekt ',' sae ',' psi u ',' psiu ',' zete ',
-            'phi delt',' azd ', 'alpha theta'],
-        ['collis','one wheelock','collis after dark','barhop'],
-        ['football','soccer','hockey','baseball','basketball','tennis','volleyball','track & field','cross country','squash'],
-        ['acapella','dog day','decibelles','brovertones','cords','rockapellas','subtleties','dodecaphonics','dodecs','aires',
-            'dartmouth symphony orchestra','soul scribes','casual thursday','rude mechanicals'],
-    ]
-
-    #print categories
 
     event_from = event_from.strip()
     if event_from.lower() in nicknames.keys():
@@ -330,18 +295,7 @@ def get_event2(event_url): # This method returns all the relevant information fo
         for pre in soup.find_all('pre'):
             txt = pre.text
 
-    # Day keywords
-    keywords = {'today':"today",
-            "tonight":"today",
-            "tomorrow":"tomorrow",
-            "monday":"0",
-            "tuesday": "1",
-            "wednesday":"2",
-            "thursday":"3",
-            "friday": "4",
-            "saturday": "5",
-            "sunday":"6"
-            }
+
 
     # Go through the message day by day.
     words = txt.split()
@@ -382,9 +336,9 @@ def get_event2(event_url): # This method returns all the relevant information fo
             elif word in categories[3]:
                 thisEvent['category'] = categories_names[3]
 
-        if thisEvent['date_event'] == '' and word.lower() in keywords.keys():
+        if thisEvent['date_event'] == '' and word.lower() in DATEKEYWORDS.keys():
             #print "Got here"
-            classifier = keywords.get(word.lower())
+            classifier = DATEKEYWORDS.get(word.lower())
             if classifier == "today":
                 # check if the event message was sent today
                 if messageDay == todayDay:
@@ -425,6 +379,34 @@ def get_event2(event_url): # This method returns all the relevant information fo
     #print thisEvent['category']
     return None
 
+def getEventsFromWeek(url, events):
+    r = requests.get(url) # stores url response in var "r"
+    soup = BeautifulSoup(r.text) # stores url response in a BeautifulSoup object for later parsing
+    iterator = 0
+    for link in soup.find_all('a'): # go through every link from the url
+        if iterator > 0: # we only want to go through this loop once, iterator makes sure of that
+            break
+        href = link.get('href') # href now holds the href of the link
+        if href: # if href isn't None
+            if  '/scripts/wa.exe?A1=' in href: # if href contains this string, it's what we're looking for
+                r = requests.get('https://listserv.dartmouth.edu'+href) # makes a new request from this link
+                soup2 = BeautifulSoup(r.text) # puts it into beautifulsoup format
+                for event in soup2.find_all('a'): # for all of the links on this page
+                    if event.get('href'):
+                        if '/scripts/wa.exe?A2=' in event.get('href'):
+                            newEvent = get_event2(urllib.quote_plus(event.get('href')))
+                            if newEvent:
+                                foundMatch = False
+                                for event in events:
+                                    if newEvent['from'] == event['from'] and newEvent['date_event'] == event['date_event'] and newEvent['time_event'] == event['time_event']:
+                                        foundMatch = True
+                                if not foundMatch:
+                                    events.append(newEvent)
+                            #TESTING - only get 10 events
+                            if len(events) >= 10:
+                                return
+                iterator = iterator + 1
+                
 # Looks for a regex match to a time pattern.
 def time_match(word):
     if word == "noon":
