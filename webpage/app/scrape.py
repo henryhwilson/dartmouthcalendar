@@ -285,7 +285,10 @@ def get_event2(event_url): # This method returns all the relevant information fo
     try:
     	utc_dt = datetime.strptime(date.replace(' +0000',''),'%a, %d %b %Y %H:%M:%S').replace(tzinfo=pytz.utc)
     except:
-    	return None
+        try:
+            utc_dt = datetime.strptime(date.replace(' -0400',''),'%a, %d %b %Y %H:%M:%S').replace(tzinfo=pytz.utc)
+    	except:
+            return None
     loc_dt = utc_dt.astimezone(timezone('US/Eastern'))
     event_date = loc_dt.strftime('%A, %b %d %I:%M%p')
 
