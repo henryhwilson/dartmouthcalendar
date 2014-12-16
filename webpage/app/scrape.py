@@ -80,6 +80,9 @@ CATEGORIES = [
 # incorporate database and get rid of only getting 10 events.
 # Make regex checking time more efficient/intuitive. 
 # Change 6pm to 6:00pm
+#some blitz_dates not showing up
+# Talks and Discussions not opening
+# let multiple sections be open
 
 # Finding time but not printing correctly
 # is it only returning an event if it is in the future?
