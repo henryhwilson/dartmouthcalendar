@@ -73,16 +73,14 @@ CATEGORIES = [
     ['rocky', 'dartmouth physics society']
 ]
 # TO DO
-# [Errno 32] Broken pipe - error
-# -4000 on time.
 # Scrape time and location.
 # Make scraping faster and more efficient
 # incorporate database and get rid of only getting 10 events.
 # Make regex checking time more efficient/intuitive. 
-# Change 6pm to 6:00pm
-#some blitz_dates not showing up
+# some blitz_dates not showing up
 # Talks and Discussions not opening
 # let multiple sections be open
+# do we need to add new categories to blitz-machine.html at the bottom with .click() and .show() and hide() - for reminder just look in this file
 
 # Finding time but not printing correctly
 # is it only returning an event if it is in the future?
@@ -219,7 +217,8 @@ def get_event(event_url): # This method returns all the relevant information for
     data.append(event_date)
     return data
 
-def get_content2(): #returns a list of recent blitzes
+#returns a list of recent blitzes
+def get_content2(): 
     # Get the month and week of month of today.
     date = datetime.now().date() 
     year = date.year
@@ -262,8 +261,8 @@ def get_content2(): #returns a list of recent blitzes
     return events
 
 
-
-def get_event2(event_url): # This method returns all the relevant information for a specific event URL given
+# This method returns all the relevant information for a specific event URL given
+def get_event2(event_url): 
     #initialize vars
     url = ''
     htmlurl = ''
@@ -277,14 +276,14 @@ def get_event2(event_url): # This method returns all the relevant information fo
     soup = BeautifulSoup(r.text)
 
     #get subject, from, and date
-    event_subject = soup.find(text="Subject:").findNext('a').contents[0].strip()           # finds subject of event
-    event_from = soup.find(text="From:").findNext('p').contents[0].replace('<','')  # finds from of event
-    date = soup.find(text="Date:").findNext('p').contents[0].replace('<','')         # finds date of blitz sent out
+    event_subject = soup.find(text="Subject:").findNext('a').contents[0].strip()     # finds subject of event
+    event_from = soup.find(text="From:").findNext('p').contents[0].replace('<','')   # finds from of event
+    date = soup.find(text="Date:").findNext('p').contents[0].replace('<','')         # finds date that the blitz sent out
 
     event_from = event_from.strip()
     if event_from.lower() in GROUP_NICKNAMES.keys():
         event_from = GROUP_NICKNAMES.get(event_from.lower())
-    #formats the date (NOTE: there's a bug where some events don't have +0000 but -4000, which throws an error)
+
     try:
     	utc_dt = datetime.strptime(date.replace(' +0000',''),'%a, %d %b %Y %H:%M:%S').replace(tzinfo=pytz.utc)
     except:
@@ -311,11 +310,6 @@ def get_event2(event_url): # This method returns all the relevant information fo
         for pre in soup.find_all('pre'):
             txt = pre.text
 
-
-
-    # Go through the message day by day.
-    words = txt.split()
-
     # Information about today and about the message.
     nowDay = datetime.now().date().day
     messageDay = loc_dt.date().day
@@ -325,8 +319,40 @@ def get_event2(event_url): # This method returns all the relevant information fo
 
     findCategory(thisEvent, event_from.lower())
 
+    # Look for information in the blitz subject line first.
+    words = re.split('[@ ]', event_subject)
+    searchForEventInfo(words, thisEvent, messageDay, messageMonth, nowDay, daysInMessageMonth, loc_dt)
+
+    # If we have all the event information that we need.
+    if (thisEvent['date_event'] != '' and thisEvent['time_event'] != ''):
+        #print 'Found date. Subject: ' + thisEvent['subject'] + ' Category: ' + thisEvent['category']
+        return thisEvent
+
+    # Now go through the actual blitz message.
+    words = re.split('[@ ]', txt)
+    searchForEventInfo(words, thisEvent, messageDay, messageMonth, nowDay, daysInMessageMonth, loc_dt)
+
+    # Return the event if it contained an event date.
+    if thisEvent['date_event'] != '':
+        return thisEvent
+
+    return None
+
+# Function that searches for event information in a list of words.
+# @words - a list of strings, which are the words that we are looping through to look for keywords.
+# @thisEvent - the event that we are looking for a date for.
+# @messageDay - the day of the month of the message.
+# @messageMonth - the month of the message.
+# @nowDay - the day of the month of right now.
+# @daysInMessageMonth - the number of days in the month the message was sent in.
+# @loc_dt - datetime object for the message
+def searchForEventInfo(words, thisEvent, messageDay, messageMonth, nowDay, daysInMessageMonth, loc_dt):
     # Loop through all the words, looking for event-related keywords.
     for word in words:
+
+        if word == "":
+            continue
+
         # Remove all punctuation, spaces, and make lower case.
         word = word.lower().strip().strip(string.punctuation)
 
@@ -350,12 +376,6 @@ def get_event2(event_url): # This method returns all the relevant information fo
             if (thisEvent['date_event'] != '' and thisEvent['time_event'] != ''):
                 #print 'Found date. Subject: ' + thisEvent['subject'] + ' Category: ' + thisEvent['category']
                 return thisEvent
-
-    # Return the event if it contained an event date.
-    if thisEvent['date_event'] != '':
-        return thisEvent
-
-    return None
 
 # Checks what day the classifier implies. Does so by comparing the message date and the
 # current date, with regard to the classifier.
@@ -455,14 +475,27 @@ def getEventsFromWeek(url, events):
 def time_match(word):
     if word == "noon":
         return "Noon"
+    if word == "midnight":
+        return "Midnight"
     # Search for times.
     match = re.search(r'(^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$)|(^[1-9]$)|(^1[0-2]$)|(([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9][ap]m)|([1-9][ap]m)|(1[0-2][ap]m)', word)
     if match:
         time = match.group()
 
         # Append :00pm to end if not present.
+        # Only edits times that have no colon and no am/pm.
+        # Example: replaces 2 with 2:00pm
         if re.search(r'((\:[0-9][0-9])|([ap]m))', time) == None:
             time = time + ":00pm"
+            
+        # Add :00 if not present.
+        # Example: replaces 4pm with 4:00pm
+        if re.search(r'(\:[0-9][0-9])', time) == None:
+            time = re.sub(r'(pm)', r':00pm',time)
+            time = re.sub(r'(am)', r':00am',time)
+        
+        # Add pm if not present.
+        # Example: replaces 2:00 with 2:00pm
         if re.search(r'([ap]m)', time) == None:
             time = time + "pm"
         return time
