@@ -328,7 +328,7 @@ def get_event2(event_url):
     findCategory(thisEvent, event_from.lower())
 
     # Look for information in the blitz subject line first.
-    words = re.split('[@ ]', event_subject)
+    words = re.split('[@\- ]', event_subject)
     searchForEventInfo(words, thisEvent, messageDay, messageMonth, nowDay, daysInMessageMonth, loc_dt)
 
     # If we have all the event information that we need.
@@ -337,7 +337,7 @@ def get_event2(event_url):
         return thisEvent
 
     # Now go through the actual blitz message.
-    words = re.split('[@ ]', txt)
+    words = re.split('[@\- ]', txt)
     searchForEventInfo(words, thisEvent, messageDay, messageMonth, nowDay, daysInMessageMonth, loc_dt)
 
     # Return the event if it contained an event date.
@@ -498,7 +498,7 @@ def getEventsFromWeek(url, events):
 # @return - tuple. First element is the part of the word that matches with a time, or None.
 #                  Second element is a flag, for if the time is just a number without am or pm.
 def time_match(word):
-    flag = 0
+    flag = NO_FLAGS
     if word == "noon":
         return "Noon"
     if word == "midnight":
