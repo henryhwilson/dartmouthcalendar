@@ -72,8 +72,14 @@ CATEGORIES = [
     # Talks and Discussions
     ['rocky', 'dartmouth physics society']
 ]
+
+# Flag for if a word that corresponds to a time does not have an am or pm at the end.
+NO_FLAGS = 0
+NO_AM = 1
+
 # TO DO
 # Scrape time and location.
+    # recognize location, maybe watch out for @ signs.
 # Make scraping faster and more efficient
 # incorporate database and get rid of only getting 10 events.
 # Make regex checking time more efficient/intuitive. 
@@ -81,7 +87,9 @@ CATEGORIES = [
 # Talks and Discussions not opening
 # let multiple sections be open
 # do we need to add new categories to blitz-machine.html at the bottom with .click() and .show() and hide() - for reminder just look in this file
-
+# Make sure November 9 does not show up as 9pm.
+    # could have a flag - like a month flag that you set to 1 if you encounter a month word.
+# Recognize 11th as a date.
 # Finding time but not printing correctly
 # is it only returning an event if it is in the future?
 
@@ -347,6 +355,10 @@ def get_event2(event_url):
 # @daysInMessageMonth - the number of days in the month the message was sent in.
 # @loc_dt - datetime object for the message
 def searchForEventInfo(words, thisEvent, messageDay, messageMonth, nowDay, daysInMessageMonth, loc_dt):
+    # A time flag for if a time is just a number without an am or pm.
+    # For cases such as "10 am" which should be 10:00am but will be 10:00pm otherwise.
+    time_flag = NO_FLAGS
+
     # Loop through all the words, looking for event-related keywords.
     for word in words:
 
@@ -356,10 +368,19 @@ def searchForEventInfo(words, thisEvent, messageDay, messageMonth, nowDay, daysI
         # Remove all punctuation, spaces, and make lower case.
         word = word.lower().strip().strip(string.punctuation)
 
+        # If the previous word was the event time and the current word is am, change time from pm to am.
+        if time_flag == NO_AM and thisEvent['time_event'] != '':
+            if word == "am":
+                thisEvent['time_event'] = re.sub(r'(pm)', r'am',thisEvent['time_event'])
+
+        # reset the time_flag.
+        time_flag = NO_FLAGS
+
+        # Find time.
         # Check if the word is a time, if we have not found time already.
         if thisEvent['time_event'] == '':
             time = None
-            time = time_match(word)
+            (time, time_flag) = time_match(word)
             if time:
                 thisEvent['time_event'] = time
 
@@ -367,15 +388,18 @@ def searchForEventInfo(words, thisEvent, messageDay, messageMonth, nowDay, daysI
         if (thisEvent['category'] == 'Misc'):
             findCategory(thisEvent, word)
 
+        # Find event date.
         # If we do not know the event date and if the word is an date keyword.
         if thisEvent['date_event'] == '' and word in DATE_KEYWORDS.keys():
             classifier = DATE_KEYWORDS.get(word) # What the word signifies.
             findEventDate(thisEvent, classifier, messageDay, messageMonth, nowDay, daysInMessageMonth, loc_dt)
 
-            # If we have all the event information that we need.
-            if (thisEvent['date_event'] != '' and thisEvent['time_event'] != ''):
-                #print 'Found date. Subject: ' + thisEvent['subject'] + ' Category: ' + thisEvent['category']
-                return thisEvent
+        # If we have all the event information that we need.
+        # ERIC-NOTE: this was nested in the previous if statement previously, but this should be correct now, 
+        # because we could get date_event info either first or second
+        if (time_flag == NO_FLAGS and thisEvent['date_event'] != '' and thisEvent['time_event'] != ''):
+            #print 'Found date. Subject: ' + thisEvent['subject'] + ' Category: ' + thisEvent['category']
+            return thisEvent
 
 # Checks what day the classifier implies. Does so by comparing the message date and the
 # current date, with regard to the classifier.
@@ -471,8 +495,10 @@ def getEventsFromWeek(url, events):
 
 # Looks for a regex match to a time pattern.
 # @word - the word that might signify a time.
-# @return - the part of the word that matches with a time, or None.
+# @return - tuple. First element is the part of the word that matches with a time, or None.
+#                  Second element is a flag, for if the time is just a number without am or pm.
 def time_match(word):
+    flag = 0
     if word == "noon":
         return "Noon"
     if word == "midnight":
@@ -483,10 +509,11 @@ def time_match(word):
         time = match.group()
 
         # Append :00pm to end if not present.
-        # Only edits times that have no colon and no am/pm.
+        # Only edits times that have no colon AND no am/pm.
         # Example: replaces 2 with 2:00pm
         if re.search(r'((\:[0-9][0-9])|([ap]m))', time) == None:
             time = time + ":00pm"
+            flag = NO_AM
             
         # Add :00 if not present.
         # Example: replaces 4pm with 4:00pm
@@ -498,6 +525,7 @@ def time_match(word):
         # Example: replaces 2:00 with 2:00pm
         if re.search(r'([ap]m)', time) == None:
             time = time + "pm"
-        return time
+            flag = NO_AM
+        return (time, flag)
 
-    return match
+    return (match, flag)
